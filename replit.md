@@ -43,7 +43,7 @@ This is a full-stack chat application built with React, Express.js, and TypeScri
 - `DELETE /api/messages` - Clear all messages (implemented in frontend)
 
 ### AI Integration
-- **Provider**: Kluster AI with Meta-Llama-3.1-8B-Instruct-Turbo model
+- **Provider**: Google Gemini AI with Gemini-1.5-Flash model
 - **Context Awareness**: Maintains conversation history for contextual responses
 - **Error Handling**: Graceful fallback for API failures
 
@@ -59,7 +59,7 @@ This is a full-stack chat application built with React, Express.js, and TypeScri
 2. **Frontend Validation**: Client validates message using Zod schema
 3. **API Request**: POST request sent to `/api/messages` endpoint
 4. **Message Storage**: User message saved to database
-5. **AI Processing**: Server sends conversation history to Kluster AI
+5. **AI Processing**: Server sends conversation history to Google Gemini AI
 6. **AI Response**: Assistant response received and stored in database
 7. **Frontend Update**: React Query invalidates cache and refetches messages
 8. **UI Refresh**: New messages displayed in chat interface
@@ -70,7 +70,7 @@ This is a full-stack chat application built with React, Express.js, and TypeScri
 - **@neondatabase/serverless**: Serverless PostgreSQL driver
 - **drizzle-orm**: Type-safe SQL ORM with PostgreSQL dialect
 - **@tanstack/react-query**: Server state management
-- **openai**: AI API client (configured for Kluster AI)
+- **@google/generative-ai**: Google Gemini AI client library
 - **@radix-ui/***: Headless UI component primitives
 - **tailwindcss**: Utility-first CSS framework
 
@@ -95,11 +95,12 @@ This is a full-stack chat application built with React, Express.js, and TypeScri
 
 ### Environment Configuration
 - **DATABASE_URL**: PostgreSQL connection string (required)
-- **KLUSTER_API_KEY**: AI service authentication
+- **OPENAI_API_KEY**: Google Gemini AI service authentication
 - **NODE_ENV**: Environment flag (development/production)
 
 ## Changelog
-- June 15, 2025. Initial setup
+- June 15, 2025. Initial setup with Kluster AI integration
+- June 15, 2025. Updated AI integration from Kluster AI to Google Gemini AI (Gemini-1.5-Flash model)
 
 ## User Preferences
 
