@@ -1,6 +1,4 @@
-import { users, messages, chatSessions, type User, type InsertUser, type Message, type InsertMessage, type ChatSession, type InsertChatSession } from "@shared/schema";
-import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { type User, type InsertUser, type Message, type InsertMessage, type ChatSession, type InsertChatSession } from "@shared/schema";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -14,22 +12,29 @@ export interface IStorage {
   updateChatSession(sessionId: string, title: string): Promise<void>;
 }
 
-export class DatabaseStorage implements IStorage {
+export class MemoryStorage implements IStorage {
+  private users: User[] = [];
+  private messages: Message[] = [];
+  private chatSessions: ChatSession[] = [];
+  private nextUserId = 1;
+  private nextMessageId = 1;
+  private nextSessionId = 1;
+
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || undefined;
+    return this.users.find(user => user.id === id);
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user || undefined;
+    return this.users.find(user => user.username === username);
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(insertUser)
-      .returning();
+    const user: User = {
+      id: this.nextUserId++,
+      username: insertUser.username,
+      password: insertUser.password,
+    };
+    this.users.push(user);
     return user;
   }
 
