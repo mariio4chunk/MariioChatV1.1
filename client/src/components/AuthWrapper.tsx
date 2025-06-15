@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { User, onAuthStateChanged } from "firebase/auth";
 import { auth, signInWithGoogle, logout } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
-import { LogIn, LogOut, User as UserIcon } from "lucide-react";
+import { LogIn, LogOut, User as UserIcon, Crown, Sparkles } from "lucide-react";
+import { FloatingParticles } from "@/components/GimmickFeatures";
 
 interface AuthWrapperProps {
   children: (user: User | null) => React.ReactNode;
@@ -52,29 +53,76 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-chat flex items-center justify-center">
-        <div className="max-w-md w-full mx-4">
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/30">
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <UserIcon className="w-8 h-8 text-white" />
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex items-center justify-center relative overflow-hidden">
+        <FloatingParticles />
+        
+        {/* Background Decoration */}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-100/20 via-transparent to-pink-100/20" />
+        
+        <div className="max-w-md w-full mx-4 z-10">
+          <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-10 shadow-2xl border border-white/50 transform transition-all duration-500 hover:scale-105">
+            <div className="text-center mb-10">
+              <div className="relative mb-6">
+                <div className="w-20 h-20 gradient-primary rounded-3xl flex items-center justify-center mx-auto shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                  <Crown className="w-10 h-10 text-white" />
+                </div>
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                  <Sparkles className="w-3 h-3 text-white" />
+                </div>
               </div>
-              <h1 className="text-2xl font-bold text-textPrimary bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-                IntelliChat AI
+              
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 bg-clip-text text-transparent mb-3">
+                Mario AI
               </h1>
-              <p className="text-gray-600">Masuk untuk melanjutkan percakapan dengan AI</p>
+              <p className="text-gray-600 text-lg mb-2">Asisten AI Cerdas</p>
+              <p className="text-gray-500 text-sm">Powered by Google Gemini</p>
             </div>
 
-            <Button
-              onClick={handleSignIn}
-              className="w-full gradient-primary text-white py-3 rounded-2xl font-medium hover:shadow-lg transition-all duration-200"
-            >
-              <LogIn className="w-5 h-5 mr-2" />
-              Masuk dengan Google
-            </Button>
+            <div className="space-y-4">
+              <Button
+                onClick={handleSignIn}
+                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-4 rounded-2xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95"
+              >
+                <LogIn className="w-5 h-5 mr-3" />
+                Masuk dengan Google
+              </Button>
+              
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-white text-gray-500">atau</span>
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-4">Fitur Mario AI:</p>
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="bg-purple-50 rounded-xl p-3 border border-purple-100">
+                    <Sparkles className="w-4 h-4 text-purple-600 mx-auto mb-1" />
+                    <span className="text-purple-700 font-medium">AI Cerdas</span>
+                  </div>
+                  <div className="bg-pink-50 rounded-xl p-3 border border-pink-100">
+                    <Crown className="w-4 h-4 text-pink-600 mx-auto mb-1" />
+                    <span className="text-pink-700 font-medium">Premium</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-            <div className="mt-6 text-center">
-              <p className="text-xs text-gray-500">Gunakan akun Google Anda untuk melanjutkan</p>
+            <div className="mt-8 text-center">
+              <p className="text-xs text-gray-400">
+                Dengan masuk, Anda menyetujui penggunaan layanan kami
+              </p>
+            </div>
+          </div>
+          
+          {/* Additional Info */}
+          <div className="mt-6 text-center">
+            <div className="inline-flex items-center space-x-2 bg-white/70 backdrop-blur-sm rounded-full px-4 py-2 shadow-md">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              <span className="text-sm text-gray-600">Mario AI siap membantu</span>
             </div>
           </div>
         </div>

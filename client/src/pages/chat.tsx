@@ -4,11 +4,12 @@ import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Bot, User, Settings, Trash2, Sparkles, Zap, MessageSquare, Plus, History } from "lucide-react";
+import { Send, Bot, User, Settings, Trash2, Sparkles, Zap, MessageSquare, Plus, History, Menu, LogOut, Crown } from "lucide-react";
 import type { Message, ChatSession } from "@shared/schema";
 import { AuthWrapper } from "@/components/AuthWrapper";
 import { AIStatusIndicator, AIThinkingVisualizer, FloatingParticles, TypingEffect } from "@/components/GimmickFeatures";
 import { User as FirebaseUser } from "firebase/auth";
+import { logout } from "@/lib/firebase";
 
 function ChatInterface({ user }: { user: FirebaseUser }) {
   const [inputValue, setInputValue] = useState("");
@@ -156,15 +157,91 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-chat">
-      {/* Sidebar for chat sessions */}
+    <div className="min-h-screen flex bg-chat">
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:flex lg:w-80 lg:flex-col bg-white/95 backdrop-blur-sm border-r border-purple-100 shadow-lg">
+        {/* Sidebar Header */}
+        <div className="p-6 border-b border-purple-100">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center shadow-lg">
+              <Crown className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Mario AI
+              </h1>
+              <p className="text-xs text-gray-500">Asisten AI Cerdas</p>
+            </div>
+          </div>
+          
+          <Button
+            onClick={createNewChat}
+            className="w-full gradient-primary text-white rounded-xl py-2.5 font-medium hover:shadow-lg transition-all duration-200"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Chat Baru
+          </Button>
+        </div>
+
+        {/* Chat Sessions */}
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="space-y-1">
+            {chatSessions.map((session) => (
+              <Button
+                key={session.sessionId}
+                variant={session.sessionId === currentSessionId ? "secondary" : "ghost"}
+                onClick={() => switchToSession(session.sessionId)}
+                className="w-full justify-start text-left p-3 rounded-xl hover:bg-purple-50 transition-colors duration-200"
+              >
+                <MessageSquare className="w-4 h-4 mr-3 text-purple-600" />
+                <div className="truncate text-sm">
+                  {session.title || `Chat ${session.sessionId.slice(0, 8)}...`}
+                </div>
+              </Button>
+            ))}
+            {chatSessions.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <MessageSquare className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                <p className="text-sm">Belum ada riwayat chat</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Sidebar Footer */}
+        <div className="p-4 border-t border-purple-100">
+          <div className="flex items-center space-x-2 bg-purple-50 rounded-xl p-3">
+            <img
+              src={user.photoURL || ""}
+              alt={user.displayName || "User"}
+              className="w-8 h-8 rounded-full"
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-700 truncate">
+                {user.displayName}
+              </p>
+              <p className="text-xs text-gray-500 truncate">{user.email}</p>
+            </div>
+            <Button
+              onClick={() => logout()}
+              variant="ghost"
+              size="sm"
+              className="p-2 rounded-full hover:bg-red-50 text-red-600"
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Sidebar */}
       {showSidebar && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowSidebar(false)} />
           <div className="absolute left-0 top-0 h-full w-80 bg-white shadow-xl">
             <div className="p-4 border-b">
               <div className="flex items-center justify-between">
-                <h2 className="font-semibold text-gray-800">Riwayat Chat</h2>
+                <h2 className="font-semibold text-gray-800">Mario AI</h2>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -203,7 +280,9 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
         </div>
       )}
 
-      {/* Header */}
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
       <header className="bg-header border-b border-white/20 px-3 py-3 shadow-lg sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -225,7 +304,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
             </div>
             <div>
               <h1 className="text-lg font-bold text-textPrimary bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                IntelliChat AI
+                Mario AI
               </h1>
               <p className="text-xs text-gray-600 font-medium">Powered by Gemini AI • v2.1</p>
             </div>
@@ -268,13 +347,13 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
               <div className="flex-1">
                 <div className="bg-aiResponse rounded-2xl rounded-tl-md px-4 py-3 message-shadow border border-white/30">
                   <div className="flex items-center space-x-2 mb-1">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-xs font-semibold text-purple-600">IntelliChat AI</span>
+                    <Crown className="w-3 h-3 text-yellow-500" />
+                    <span className="text-xs font-semibold text-purple-600">Mario AI</span>
                   </div>
                   <p className="text-textPrimary text-sm leading-relaxed">
-                    Selamat datang di <span className="font-semibold text-purple-600">IntelliChat AI</span>! 🚀 
-                    Saya adalah asisten AI canggih yang siap membantu Anda dengan berbagai tugas seperti menjawab pertanyaan, 
-                    analisis data, menulis konten kreatif, dan diskusi mendalam. Mari mulai percakapan yang menarik!
+                    Ciao! Saya <span className="font-semibold text-purple-600">Mario AI</span>, asisten AI yang siap membantu Anda! 
+                    Saya dapat menjawab pertanyaan, menganalisis data, menulis konten kreatif, dan berdiskusi tentang berbagai topik. 
+                    Apa yang bisa saya bantu hari ini?
                   </p>
                 </div>
                 <div className="mt-1 text-xs text-gray-500 px-4 flex items-center space-x-2">
@@ -399,10 +478,52 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
           </div>
         )}
 
+        {/* Suggestions */}
+        {messages.length === 0 && !isTyping && (
+          <div className="px-3 pb-4 max-w-4xl mx-auto w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {[
+                "Ceritakan lelucon lucu tentang teknologi",
+                "Jelaskan kecerdasan buatan dengan sederhana",
+                "Buatkan puisi tentang teknologi",
+                "Bagaimana cara belajar programming?"
+              ].map((suggestion, index) => (
+                <button
+                  key={index}
+                  onClick={() => insertSuggestion(suggestion)}
+                  className="p-3 text-left text-sm text-gray-600 bg-white/60 hover:bg-white/80 rounded-xl border border-purple-100 hover:border-purple-200 transition-all duration-200 hover:shadow-md"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Input Area */}
-        <div className="border-t border-white/20 bg-header px-3 py-3 sticky bottom-0 mobile-safe-area">
+        <div className="border-t border-white/20 bg-gradient-to-b from-white/50 to-white/80 backdrop-blur-sm px-3 py-4 sticky bottom-0 mobile-safe-area">
           <div className="max-w-4xl mx-auto">
-            <div className="flex items-end space-x-2">
+            {/* Quick Actions */}
+            <div className="flex items-center space-x-2 mb-3 overflow-x-auto">
+              {[
+                { icon: Plus, label: "Chat Baru", action: createNewChat },
+                { icon: History, label: "Riwayat", action: () => setShowSidebar(true) },
+                { icon: Trash2, label: "Hapus", action: () => clearMessagesMutation.mutate() }
+              ].map((item, index) => (
+                <Button
+                  key={index}
+                  variant="ghost"
+                  size="sm"
+                  onClick={item.action}
+                  className="flex items-center space-x-1 px-3 py-2 rounded-full bg-white/70 hover:bg-white/90 border border-purple-100 text-purple-600 hover:text-purple-700 transition-all duration-200 whitespace-nowrap"
+                >
+                  <item.icon className="w-3 h-3" />
+                  <span className="text-xs font-medium">{item.label}</span>
+                </Button>
+              ))}
+            </div>
+
+            <div className="flex items-end space-x-3">
               <div className="flex-1">
                 <div className="relative">
                   <Textarea
@@ -410,29 +531,50 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                     value={inputValue}
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
-                    placeholder="Ketik pesan Anda di sini..."
-                    className="w-full px-4 py-3 pr-12 border border-purple-200/50 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none overflow-hidden mobile-input max-h-32 text-sm text-textPrimary bg-white/90 backdrop-blur-sm shadow-md placeholder:text-gray-500"
+                    placeholder="Tanyakan apa saja kepada Mario AI..."
+                    className="w-full px-4 py-4 pr-16 border-2 border-purple-200/50 rounded-2xl focus:ring-2 focus:ring-purple-400 focus:border-purple-400 resize-none overflow-hidden mobile-input max-h-32 text-sm text-textPrimary bg-white/95 backdrop-blur-sm shadow-lg placeholder:text-gray-500 transition-all duration-200"
                     rows={1}
                   />
-                  <div className="absolute bottom-1.5 right-12 text-xs text-gray-400 font-medium">
+                  <div className="absolute bottom-2 right-16 text-xs font-medium">
                     <span className={inputValue.length > 1800 ? "text-red-500" : inputValue.length > 1500 ? "text-amber-500" : "text-purple-500"}>
                       {inputValue.length}
-                    </span>/2000
+                    </span>
+                    <span className="text-gray-400">/2000</span>
                   </div>
+                  {inputValue.trim() && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setInputValue("")}
+                      className="absolute bottom-2 right-2 p-1 h-6 w-6 rounded-full hover:bg-gray-100"
+                    >
+                      <span className="text-gray-400 text-xs">×</span>
+                    </Button>
+                  )}
                 </div>
               </div>
               
               <Button
                 onClick={handleSend}
                 disabled={!inputValue.trim() || sendMessageMutation.isPending}
-                className="gradient-primary hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-white p-3 rounded-xl transition-all duration-200 transform hover:scale-105 active:scale-95 border border-purple-300/20 mobile-input"
+                className="gradient-primary hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-white p-4 rounded-2xl transition-all duration-200 transform hover:scale-105 active:scale-95 border-2 border-purple-300/30 mobile-input shadow-lg"
               >
-                <Send className="w-4 h-4" />
+                {sendMessageMutation.isPending ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
               </Button>
+            </div>
+            
+            <div className="mt-2 text-xs text-gray-500 text-center">
+              Tekan <kbd className="px-1 py-0.5 bg-gray-100 rounded text-gray-600">Enter</kbd> untuk kirim, 
+              <kbd className="px-1 py-0.5 bg-gray-100 rounded text-gray-600 ml-1">Shift + Enter</kbd> untuk baris baru
             </div>
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }
