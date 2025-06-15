@@ -4,12 +4,17 @@ import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Bot, User, Settings, Trash2, Sparkles, Zap, MessageSquare, Plus, History, Menu, LogOut, Crown } from "lucide-react";
+import { Send, Bot, User, Settings, Trash2, Sparkles, Zap, MessageSquare, Plus, History, Menu, LogOut, Crown, UserCircle, FileText, Download, Copy } from "lucide-react";
 import type { Message, ChatSession } from "@shared/schema";
 import { AuthWrapper } from "@/components/AuthWrapper";
 import { AIStatusIndicator, AIThinkingVisualizer, FloatingParticles, TypingEffect } from "@/components/GimmickFeatures";
 import { User as FirebaseUser } from "firebase/auth";
 import { logout } from "@/lib/firebase";
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import remarkGfm from 'remark-gfm';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 function ChatInterface({ user }: { user: FirebaseUser }) {
   const [inputValue, setInputValue] = useState("");
@@ -18,10 +23,80 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
     crypto.randomUUID()
   );
   const [showSidebar, setShowSidebar] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  // Markdown rendering component
+  const MarkdownMessage = ({ content }: { content: string }) => (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      className="prose prose-sm max-w-none text-textPrimary prose-headings:text-purple-700 prose-strong:text-purple-600 prose-code:text-pink-600 prose-code:bg-purple-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-white prose-blockquote:border-purple-300 prose-blockquote:bg-purple-50 prose-table:text-sm"
+      components={{
+        code({ node, inline, className, children, ...props }) {
+          const match = /language-(\w+)/.exec(className || '');
+          return !inline && match ? (
+            <SyntaxHighlighter
+              style={oneDark}
+              language={match[1]}
+              PreTag="div"
+              className="rounded-lg"
+              {...props}
+            >
+              {String(children).replace(/\n$/, '')}
+            </SyntaxHighlighter>
+          ) : (
+            <code className={className} {...props}>
+              {children}
+            </code>
+          );
+        },
+        table({ children }) {
+          return (
+            <div className="my-4 overflow-x-auto">
+              <Table className="border border-purple-200 rounded-lg">
+                {children}
+              </Table>
+            </div>
+          );
+        },
+        thead({ children }) {
+          return <TableHeader className="bg-purple-50">{children}</TableHeader>;
+        },
+        tbody({ children }) {
+          return <TableBody>{children}</TableBody>;
+        },
+        tr({ children }) {
+          return <TableRow>{children}</TableRow>;
+        },
+        th({ children }) {
+          return <TableHead className="font-semibold text-purple-700 border-r border-purple-200 last:border-r-0">{children}</TableHead>;
+        },
+        td({ children }) {
+          return <TableCell className="border-r border-purple-100 last:border-r-0">{children}</TableCell>;
+        },
+        blockquote({ children }) {
+          return (
+            <blockquote className="border-l-4 border-purple-300 bg-purple-50 pl-4 py-2 my-3 rounded-r-lg">
+              {children}
+            </blockquote>
+          );
+        },
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  );
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied!",
+      description: "Message copied to clipboard",
+    });
+  };
 
   // Fetch messages for current session
   const { data: messages = [], isLoading } = useQuery<Message[]>({
@@ -210,29 +285,92 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
 
         {/* Sidebar Footer */}
         <div className="p-4 border-t border-purple-100">
-          <div className="flex items-center space-x-2 bg-purple-50 rounded-xl p-3">
-            <img
-              src={user.photoURL || ""}
-              alt={user.displayName || "User"}
-              className="w-8 h-8 rounded-full"
-            />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-700 truncate">
-                {user.displayName}
-              </p>
-              <p className="text-xs text-gray-500 truncate">{user.email}</p>
-            </div>
+          <div className="space-y-2">
+            <Button
+              onClick={() => setShowProfile(true)}
+              variant="ghost"
+              className="w-full justify-start p-3 rounded-xl hover:bg-purple-50 transition-colors duration-200"
+            >
+              <UserCircle className="w-4 h-4 mr-3 text-purple-600" />
+              <div className="flex-1 text-left">
+                <div className="text-sm font-medium text-gray-700 truncate">
+                  {user.displayName}
+                </div>
+                <div className="text-xs text-gray-500">View Profile</div>
+              </div>
+            </Button>
             <Button
               onClick={() => logout()}
               variant="ghost"
-              size="sm"
-              className="p-2 rounded-full hover:bg-red-50 text-red-600"
+              className="w-full justify-start p-3 rounded-xl hover:bg-red-50 text-red-600 transition-colors duration-200"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4 h-4 mr-3" />
+              <span className="text-sm">Sign Out</span>
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Profile Modal */}
+      {showProfile && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowProfile(false)} />
+          <div className="relative bg-white rounded-3xl shadow-2xl p-8 m-4 max-w-md w-full">
+            <div className="text-center">
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden shadow-lg">
+                <img
+                  src={user.photoURL || ""}
+                  alt={user.displayName || "User"}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                {user.displayName}
+              </h2>
+              <p className="text-gray-600 mb-6">{user.email}</p>
+              
+              <div className="space-y-3">
+                <div className="bg-purple-50 rounded-xl p-4 text-left">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <MessageSquare className="w-4 h-4 text-purple-600" />
+                    <span className="text-sm font-medium text-purple-700">Chat Sessions</span>
+                  </div>
+                  <p className="text-2xl font-bold text-purple-600">{chatSessions.length}</p>
+                </div>
+                
+                <div className="bg-blue-50 rounded-xl p-4 text-left">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Sparkles className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm font-medium text-blue-700">AI Model</span>
+                  </div>
+                  <p className="text-sm text-blue-600 font-medium">Gemini AI Enhanced</p>
+                </div>
+              </div>
+              
+              <div className="flex space-x-3 mt-6">
+                <Button
+                  onClick={() => setShowProfile(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Close
+                </Button>
+                <Button
+                  onClick={() => {
+                    logout();
+                    setShowProfile(false);
+                  }}
+                  variant="destructive"
+                  className="flex-1"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mobile Sidebar */}
       {showSidebar && (
@@ -283,9 +421,9 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-      <header className="bg-header border-b border-white/20 px-3 py-3 shadow-lg sticky top-0 z-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+      <header className="bg-header border-b border-white/20 px-4 py-4 shadow-lg sticky top-0 z-10">
+        <div className="flex items-center justify-between max-w-6xl mx-auto w-full">
+          <div className="flex items-center space-x-4">
             <Button
               variant="ghost"
               size="sm"
@@ -295,25 +433,33 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
               <History className="w-4 h-4" />
             </Button>
             <div className="relative">
-              <div className="w-8 h-8 gradient-primary rounded-xl flex items-center justify-center shadow-lg">
-                <Sparkles className="w-4 h-4 text-white" />
+              <div className="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center shadow-lg">
+                <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border border-white flex items-center justify-center">
-                <Zap className="w-1.5 h-1.5 text-white" />
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white flex items-center justify-center">
+                <Zap className="w-2 h-2 text-white" />
               </div>
             </div>
             <div>
-              <h1 className="text-lg font-bold text-textPrimary bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-xl font-bold text-textPrimary bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Mario AI
               </h1>
-              <p className="text-xs text-gray-600 font-medium">Powered by Gemini AI • v2.1</p>
+              <p className="text-sm text-gray-600 font-medium">Powered by Gemini AI • Enhanced Edition</p>
             </div>
           </div>
-          <div className="flex items-center space-x-1">
-            <div className="hidden sm:flex items-center space-x-1 text-xs text-gray-500">
+          <div className="flex items-center space-x-2">
+            <div className="hidden sm:flex items-center space-x-2 bg-green-50 px-3 py-1 rounded-full">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span>Online</span>
+              <span className="text-xs font-medium text-green-700">Online</span>
             </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowProfile(true)}
+              className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-200"
+            >
+              <UserCircle className="w-4 h-4" />
+            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -330,7 +476,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
         </div>
         
         {/* AI Status Indicator */}
-        <div className="mt-3">
+        <div className="mt-4 max-w-6xl mx-auto w-full">
           <AIStatusIndicator />
         </div>
       </header>
@@ -338,7 +484,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
       {/* Chat Container */}
       <div className="flex-1 flex flex-col w-full">
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4 max-w-4xl mx-auto w-full">
+        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 max-w-6xl mx-auto w-full">
           {messages.length === 0 && (
             <div className="flex items-start space-x-3">
               <div className="w-8 h-8 gradient-primary rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
@@ -368,48 +514,65 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex items-start space-x-3 ${
+              className={`flex items-start space-x-4 ${
                 message.role === "user" ? "justify-end" : ""
               }`}
             >
               {message.role === "assistant" && (
-                <div className="w-8 h-8 gradient-primary rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
-                  <Sparkles className="w-4 h-4 text-white" />
+                <div className="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <Sparkles className="w-5 h-5 text-white" />
                 </div>
               )}
               
-              <div className={`flex-1 ${message.role === "user" ? "flex flex-col items-end" : ""}`}>
+              <div className={`flex-1 ${message.role === "user" ? "flex flex-col items-end" : ""} max-w-4xl`}>
                 {message.role === "assistant" && (
-                  <div className="flex items-center space-x-2 mb-1 px-4">
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    <span className="text-xs font-semibold text-purple-600">IntelliChat AI</span>
+                  <div className="flex items-center justify-between w-full mb-2 px-4">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span className="text-sm font-semibold text-purple-600">Mario AI</span>
+                      <span className="text-xs text-gray-500">Enhanced Response</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard(message.content)}
+                        className="p-1.5 h-auto text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg"
+                      >
+                        <Copy className="w-3 h-3" />
+                      </Button>
+                    </div>
                   </div>
                 )}
                 <div
-                  className={`rounded-2xl px-4 py-3 message-shadow ${
+                  className={`rounded-2xl px-5 py-4 message-shadow ${
                     message.role === "user"
-                      ? "gradient-primary text-white rounded-tr-md border border-purple-300/20 max-w-xs sm:max-w-md"
-                      : "bg-aiResponse text-textPrimary rounded-tl-md border border-white/30 max-w-full"
+                      ? "gradient-primary text-white rounded-tr-md border border-purple-300/20 max-w-md"
+                      : "bg-aiResponse text-textPrimary rounded-tl-md border border-white/30 w-full"
                   }`}
                 >
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                    {message.content}
-                  </p>
+                  {message.role === "assistant" ? (
+                    <MarkdownMessage content={message.content} />
+                  ) : (
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                      {message.content}
+                    </p>
+                  )}
                 </div>
-                <div className="mt-1 text-xs text-gray-500 px-4 flex items-center space-x-2">
+                <div className="mt-2 text-xs text-gray-500 px-5 flex items-center space-x-2">
                   <span>{formatTimestamp(message.timestamp)}</span>
                   {message.role === "assistant" && (
                     <>
                       <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-                      <span className="text-purple-500 font-medium">AI Response</span>
+                      <span className="text-purple-500 font-medium">Enhanced AI</span>
                     </>
                   )}
                 </div>
               </div>
 
               {message.role === "user" && (
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
-                  <User className="w-4 h-4 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <User className="w-5 h-5 text-white" />
                 </div>
               )}
             </div>
@@ -448,7 +611,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
 
         {/* Suggestions (positioned above input) */}
         {messages.length === 0 && (
-          <div className="px-3 pb-2 max-w-4xl mx-auto w-full">
+          <div className="px-4 pb-3 max-w-6xl mx-auto w-full">
             <div className="flex flex-wrap gap-2">
               <Button
                 variant="secondary"
@@ -480,7 +643,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
 
         {/* Suggestions */}
         {messages.length === 0 && !isTyping && (
-          <div className="px-3 pb-4 max-w-4xl mx-auto w-full">
+          <div className="px-4 pb-6 max-w-6xl mx-auto w-full">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {[
                 "Ceritakan lelucon lucu tentang teknologi",
@@ -501,8 +664,8 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
         )}
 
         {/* Input Area */}
-        <div className="border-t border-white/20 bg-gradient-to-b from-white/50 to-white/80 backdrop-blur-sm px-3 py-4 sticky bottom-0 mobile-safe-area">
-          <div className="max-w-4xl mx-auto">
+        <div className="border-t border-white/20 bg-gradient-to-b from-white/50 to-white/80 backdrop-blur-sm px-4 py-6 sticky bottom-0 mobile-safe-area">
+          <div className="max-w-6xl mx-auto">
             {/* Quick Actions */}
             <div className="flex items-center space-x-2 mb-3 overflow-x-auto">
               {[
