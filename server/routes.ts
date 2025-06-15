@@ -2,13 +2,11 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertMessageSchema } from "@shared/schema";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Initialize OpenAI client for Kluster AI
-const openai = new OpenAI({
-  apiKey: process.env.KLUSTER_API_KEY || "6c61e9cf-4026-4006-acc9-a8a70e8a6371",
-  baseURL: "https://api.kluster.ai/v1"
-});
+// Initialize Google Gemini AI client
+const genAI = new GoogleGenerativeAI(process.env.OPENAI_API_KEY || "");
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all messages
@@ -41,16 +39,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         content: msg.content
       }));
 
-      // Call Kluster AI API
+      // Call Google Gemini AI API
       try {
-        const completion = await openai.chat.completions.create({
-          model: "klusterai/Meta-Llama-3.1-8B-Instruct-Turbo",
-          messages: conversationHistory,
-          max_tokens: 1000,
-          temperature: 0.7,
+        // Format conversation history for Gemini
+        const chatHistory = conversationHistory.slice(0, -1).map(msg => ({
+          role: msg.role === "user" ? "user" : "model",
+          parts: [{ text: msg.content }]
+        }));
+
+        const chat = model.startChat({
+          history: chatHistory,
         });
 
-        const aiResponse = completion.choices[0]?.message?.content;
+        const result = await chat.sendMessage(validatedData.content);
+        const aiResponse = result.response.text();
         
         if (!aiResponse) {
           throw new Error("No response from AI");
@@ -68,7 +70,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
 
       } catch (aiError) {
-        console.error("Kluster AI API error:", aiError);
+        console.error("Google Gemini AI API error:", aiError);
         res.status(500).json({ 
           error: "Failed to get AI response", 
           details: aiError instanceof Error ? aiError.message : "Unknown AI error"

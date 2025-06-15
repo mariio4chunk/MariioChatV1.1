@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a full-stack chat application built with React, Express.js, and TypeScript. The application features a modern chat interface that allows users to interact with an AI assistant powered by Kluster AI's Llama model. The system uses a monorepo structure with shared schema definitions and implements real-time messaging capabilities.
+This is a full-stack chat application built with React, Express.js, and TypeScript. The application features a modern chat interface that allows users to interact with an AI assistant powered by Google Gemini AI. The system uses a monorepo structure with shared schema definitions and implements real-time messaging capabilities.
 
 ## System Architecture
 

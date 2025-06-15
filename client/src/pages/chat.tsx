@@ -135,8 +135,8 @@ export default function Chat() {
               <Bot className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-textPrimary">Kluster AI</h1>
-              <p className="text-xs text-gray-500">Meta-Llama-3.1-8B-Instruct-Turbo</p>
+              <h1 className="text-lg font-semibold text-textPrimary">Gemini AI</h1>
+              <p className="text-xs text-gray-500">Google Gemini-1.5-Flash</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -172,7 +172,7 @@ export default function Chat() {
               <div className="flex-1">
                 <div className="bg-aiResponse rounded-2xl rounded-tl-md px-4 py-3 max-w-3xl">
                   <p className="text-textPrimary text-sm leading-relaxed">
-                    Hello! I'm your AI assistant powered by Meta-Llama-3.1-8B-Instruct-Turbo. I'm here to help you with questions, creative tasks, analysis, and conversation. What would you like to explore today?
+                    Hello! I'm your AI assistant powered by Google Gemini-1.5-Flash. I'm here to help you with questions, creative tasks, analysis, and conversation. What would you like to explore today?
                   </p>
                 </div>
                 <div className="mt-1 text-xs text-gray-500 px-4">
