@@ -270,7 +270,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
   return (
     <div className="min-h-screen flex bg-white">
       {/* Desktop Sidebar */}
-      <div className="hidden lg:flex lg:w-64 lg:flex-col bg-gray-900 text-white">
+      <div className="hidden lg:flex lg:w-64 lg:flex-col bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-2xl">
         {/* Sidebar Header */}
         <div className="p-4 border-b border-gray-700">
           <Button
@@ -441,7 +441,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+        <header className="bg-white/90 backdrop-blur-lg border-b border-gray-200/50 px-4 py-3 flex items-center justify-between sticky top-0 z-10 shadow-sm">
           <div className="flex items-center space-x-3">
             <Button
               variant="ghost"
@@ -451,7 +451,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
             >
               <Menu className="w-5 h-5" />
             </Button>
-            <h1 className="text-xl font-semibold text-gray-900">Mario AI</h1>
+            <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">Mario AI</h1>
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -472,11 +472,11 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
             {messages.length === 0 && !isTyping ? (
               /* Welcome Screen */
               <div className="flex flex-col items-center justify-center h-full px-4 py-8">
-                <div className="w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center mb-6">
-                  <span className="text-white text-2xl font-bold">M</span>
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl flex items-center justify-center mb-8 shadow-xl animate-pulse">
+                  <span className="text-white text-3xl font-bold">M</span>
                 </div>
 
-                <h1 className="text-4xl font-semibold text-gray-900 mb-4 text-center">
+                <h1 className="text-4xl font-semibold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-4 text-center">
                   Apa yang bisa saya bantu?
                 </h1>
 
@@ -611,7 +611,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
           </div>
 
           {/* Input Area */}
-          <div className="border-t border-gray-200 bg-white px-4 py-4 sticky bottom-0">
+          <div className="border-t border-gray-200/50 bg-white/90 backdrop-blur-lg px-4 py-4 sticky bottom-0 shadow-lg">
             <div className="max-w-4xl mx-auto">
               <div className="flex items-end space-x-3">
                 <div className="flex-1">
@@ -640,7 +640,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                 <Button
                   onClick={handleSend}
                   disabled={!inputValue.trim() || sendMessageMutation.isPending}
-                  className="bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white p-3 rounded-full transition-all duration-200 shadow-sm"
+                  className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed text-white p-3 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
                   {sendMessageMutation.isPending ? (
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -2,10 +2,10 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDOCAbC123dEf456GhI789jKl01-MnO2pQ",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
+  apiKey: "AIzaSyBwJiP9Lmp3QhVHlYwZN9b8N5B5y8g7X4M",
+  authDomain: "mariio-chatt.firebaseapp.com",
+  projectId: "mariio-chatt",
+  storageBucket: "mariio-chatt.appspot.com",
   messagingSenderId: "123456789012",
   appId: "1:123456789012:web:abc123def456ghi789jkl"
 };
@@ -21,9 +21,16 @@ const googleProvider = new GoogleAuthProvider();
 
 export const signInWithGoogle = async () => {
   try {
+    googleProvider.setCustomParameters({
+      prompt: 'select_account'
+    });
     const result = await signInWithPopup(auth, googleProvider);
     return result.user;
-  } catch (error) {
+  } catch (error: any) {
+    if (error.code === 'auth/popup-closed-by-user') {
+      console.log("Login popup was closed by user");
+      return null;
+    }
     console.error("Error signing in with Google:", error);
     throw error;
   }
