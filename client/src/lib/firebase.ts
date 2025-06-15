@@ -4,9 +4,9 @@ import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBsmyMOJ4Dzcx85R-U2gHWcWMoRLNhXfT4",
-  authDomain: "mario-chatt.firebaseapp.com",
-  projectId: "mario-chatt",
-  storageBucket: "mario-chatt.firebasestorage.app",
+  authDomain: "mariio-chatt.firebaseapp.com",
+  projectId: "mariio-chatt",
+  storageBucket: "mariio-chatt.firebasestorage.app",
   messagingSenderId: "549135172436",
   appId: "1:549135172436:web:d165b694bb9a6eb66ebec1",
   measurementId: "G-7MBBGJMHE"
