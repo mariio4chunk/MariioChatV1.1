@@ -13,14 +13,14 @@ export const messages = pgTable("messages", {
   content: text("content").notNull(),
   role: text("role").notNull(), // 'user' or 'assistant'
   timestamp: timestamp("timestamp").defaultNow().notNull(),
-  userId: text("user_id"),
-  sessionId: text("session_id"),
+  userId: text("user_id").notNull(),
+  sessionId: text("session_id").notNull(),
 });
 
 export const chatSessions = pgTable("chat_sessions", {
   id: serial("id").primaryKey(),
   sessionId: text("session_id").notNull().unique(),
-  userId: text("user_id"),
+  userId: text("user_id").notNull(),
   title: text("title").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

@@ -1,11 +1,11 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertMessageSchema } from "@shared/schema";
+import { insertMessageSchema, insertChatSessionSchema } from "@shared/schema";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize Google Gemini AI client
-const genAI = new GoogleGenerativeAI(process.env.OPENAI_API_KEY || "");
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export async function registerRoutes(app: Express): Promise<Server> {

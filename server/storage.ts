@@ -46,6 +46,7 @@ export class MemoryStorage implements IStorage {
       id: this.nextMessageId++,
       content: insertMessage.content,
       role: insertMessage.role,
+      userId: insertMessage.userId,
       sessionId: insertMessage.sessionId,
       timestamp: new Date(),
     };
@@ -72,6 +73,7 @@ export class MemoryStorage implements IStorage {
 
   async createChatSession(session: InsertChatSession): Promise<ChatSession> {
     const chatSession: ChatSession = {
+      id: this.nextSessionId++,
       sessionId: session.sessionId,
       userId: session.userId,
       title: session.title,
