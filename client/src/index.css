@@ -146,3 +146,20 @@
   background-size: 200px 100%;
   animation: shimmer 2s infinite;
 }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-10px) rotate(120deg); }
+  66% { transform: translateY(5px) rotate(240deg); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Mobile-safe area adjustments */
+@media (max-width: 640px) {
+  .mobile-safe-area {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

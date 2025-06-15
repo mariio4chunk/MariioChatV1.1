@@ -9,10 +9,11 @@ const genAI = new GoogleGenerativeAI(process.env.OPENAI_API_KEY || "");
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Get all messages
+  // Get messages (optionally filtered by session)
   app.get("/api/messages", async (req, res) => {
     try {
-      const messages = await storage.getMessages();
+      const sessionId = req.query.sessionId as string;
+      const messages = await storage.getMessages(sessionId);
       res.json(messages);
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -32,8 +33,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Save user message
       const userMessage = await storage.createMessage(validatedData);
 
-      // Get conversation history for context
-      const messageHistory = await storage.getMessages();
+      // Create or update chat session
+      try {
+        await storage.createChatSession({
+          sessionId: validatedData.sessionId,
+          userId: validatedData.userId,
+          title: validatedData.content.slice(0, 50) + (validatedData.content.length > 50 ? "..." : ""),
+        });
+      } catch (error) {
+        // Session might already exist, continue
+      }
+
+      // Get conversation history for context (session-specific)
+      const messageHistory = await storage.getMessages(validatedData.sessionId);
       const conversationHistory = messageHistory.map(msg => ({
         role: msg.role as "user" | "assistant",
         content: msg.content
@@ -61,7 +73,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Save AI response
         const aiMessage = await storage.createMessage({
           content: aiResponse,
-          role: "assistant"
+          role: "assistant",
+          userId: validatedData.userId,
+          sessionId: validatedData.sessionId,
         });
 
         res.json({
@@ -83,14 +97,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Clear all messages
+  // Clear messages (optionally session-specific)
   app.delete("/api/messages", async (req, res) => {
     try {
-      await storage.clearMessages();
-      res.json({ message: "All messages cleared" });
+      const sessionId = req.query.sessionId as string;
+      await storage.clearMessages(sessionId);
+      res.json({ message: sessionId ? "Session messages cleared" : "All messages cleared" });
     } catch (error) {
       console.error("Error clearing messages:", error);
       res.status(500).json({ error: "Failed to clear messages" });
+    }
+  });
+
+  // Get chat sessions for a user
+  app.get("/api/sessions", async (req, res) => {
+    try {
+      const userId = req.query.userId as string;
+      const sessions = await storage.getChatSessions(userId);
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching sessions:", error);
+      res.status(500).json({ error: "Failed to fetch sessions" });
+    }
+  });
+
+  // Create a new chat session
+  app.post("/api/sessions", async (req, res) => {
+    try {
+      const sessionData = insertChatSessionSchema.parse(req.body);
+      const session = await storage.createChatSession(sessionData);
+      res.json(session);
+    } catch (error) {
+      console.error("Error creating session:", error);
+      res.status(500).json({ error: "Failed to create session" });
+    }
+  });
+
+  // Update chat session title
+  app.patch("/api/sessions/:sessionId", async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const { title } = req.body;
+      await storage.updateChatSession(sessionId, title);
+      res.json({ message: "Session updated" });
+    } catch (error) {
+      console.error("Error updating session:", error);
+      res.status(500).json({ error: "Failed to update session" });
     }
   });
 
