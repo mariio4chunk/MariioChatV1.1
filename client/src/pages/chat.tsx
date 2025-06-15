@@ -33,63 +33,64 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
   const MarkdownMessage = ({ content }: { content: string }) => {
     try {
       return (
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          className="prose prose-sm max-w-none text-textPrimary prose-headings:text-gray-800 prose-strong:text-gray-900 prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-white prose-blockquote:border-gray-300 prose-blockquote:bg-gray-50 prose-table:text-sm"
-          components={{
-        code({ node, inline, className, children, ...props }) {
-          const match = /language-(\w+)/.exec(className || '');
-          return !inline && match ? (
-            <SyntaxHighlighter
-              style={oneDark}
-              language={match[1]}
-              PreTag="div"
-              className="rounded-lg"
-              {...props}
-            >
-              {String(children).replace(/\n$/, '')}
-            </SyntaxHighlighter>
-          ) : (
-            <code className={className} {...props}>
-              {children}
-            </code>
-          );
-        },
-        table({ children }) {
-          return (
-            <div className="my-4 overflow-x-auto">
-              <Table className="border border-gray-200 rounded-lg">
-                {children}
-              </Table>
-            </div>
-          );
-        },
-        thead({ children }) {
-          return <TableHeader className="bg-gray-50">{children}</TableHeader>;
-        },
-        tbody({ children }) {
-          return <TableBody>{children}</TableBody>;
-        },
-        tr({ children }) {
-          return <TableRow>{children}</TableRow>;
-        },
-        th({ children }) {
-          return <TableHead className="font-semibold text-gray-700 border-r border-gray-200 last:border-r-0">{children}</TableHead>;
-        },
-        td({ children }) {
-          return <TableCell className="border-r border-gray-100 last:border-r-0">{children}</TableCell>;
-        },
-        blockquote({ children }) {
-          return (
-            <blockquote className="border-l-4 border-gray-300 bg-gray-50 pl-4 py-2 my-3 rounded-r-lg">
-              {children}
-            </blockquote>
-          );
-        },
-      }}
-    >
-      {content}
-    </ReactMarkdown>
+        <div className="prose prose-sm max-w-none text-textPrimary prose-headings:text-gray-800 prose-strong:text-gray-900 prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-white prose-blockquote:border-gray-300 prose-blockquote:bg-gray-50 prose-table:text-sm">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              code({ node, inline, className, children, ...props }) {
+                const match = /language-(\w+)/.exec(className || '');
+                return !inline && match ? (
+                  <SyntaxHighlighter
+                    style={oneDark}
+                    language={match[1]}
+                    PreTag="div"
+                    customStyle={{ borderRadius: '0.5rem' }}
+                    {...props}
+                  >
+                    {String(children).replace(/\n$/, '')}
+                  </SyntaxHighlighter>
+                ) : (
+                  <code {...props}>
+                    {children}
+                  </code>
+                );
+              },
+              table({ children, ...props }) {
+                return (
+                  <div className="my-4 overflow-x-auto">
+                    <Table className="border border-gray-200 rounded-lg">
+                      {children}
+                    </Table>
+                  </div>
+                );
+              },
+              thead({ children, ...props }) {
+                return <TableHeader className="bg-gray-50">{children}</TableHeader>;
+              },
+              tbody({ children, ...props }) {
+                return <TableBody>{children}</TableBody>;
+              },
+              tr({ children, ...props }) {
+                return <TableRow>{children}</TableRow>;
+              },
+              th({ children, ...props }) {
+                return <TableHead className="font-semibold text-gray-700 border-r border-gray-200 last:border-r-0">{children}</TableHead>;
+              },
+              td({ children, ...props }) {
+                return <TableCell className="border-r border-gray-100 last:border-r-0">{children}</TableCell>;
+              },
+              blockquote({ children, ...props }) {
+                return (
+                  <blockquote className="border-l-4 border-gray-300 bg-gray-50 pl-4 py-2 my-3 rounded-r-lg">
+                    {children}
+                  </blockquote>
+                );
+              },
+            }}
+          >
+            {content}
+          </ReactMarkdown>
+        </div>
       );
     } catch (error) {
       console.error('Error rendering markdown:', error);

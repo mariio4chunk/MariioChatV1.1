@@ -115,6 +115,16 @@
   outline-offset: 2px;
 }
 
+/* Float animation for particles */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
 .dark {
   --background: hsl(0, 0%, 9%);
   --foreground: hsl(0, 0%, 98%);
