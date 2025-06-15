@@ -24,7 +24,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Send a new message and get AI response
   app.post("/api/messages", async (req, res) => {
     try {
-      const validatedData = insertMessageSchema.parse(req.body);
+      const { model, ...messageData } = req.body;
+      const validatedData = insertMessageSchema.parse(messageData);
       
       if (validatedData.role !== "user") {
         return res.status(400).json({ error: "Only user messages can be sent" });
@@ -59,7 +60,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           parts: [{ text: msg.content }]
         }));
 
-        const chat = model.startChat({
+        // Select AI model based on request
+        const selectedModel = model || "gemini-1.5-flash";
+        const aiModel = genAI.getGenerativeModel({ model: selectedModel });
+        
+        const chat = aiModel.startChat({
           history: chatHistory,
         });
 

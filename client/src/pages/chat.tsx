@@ -4,7 +4,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Bot, User, Settings, Trash2, Sparkles, Zap, MessageSquare, Plus, History, Menu, LogOut, Crown, UserCircle, FileText, Download, Copy, Image, Globe, Clock, Lightbulb, Folder, Mic } from "lucide-react";
+import { Send, Bot, User, Settings, Trash2, Sparkles, Zap, MessageSquare, Plus, History, Menu, LogOut, Crown, UserCircle, FileText, Download, Copy, Image, Globe, Clock, Lightbulb, Folder, Mic, X, ChevronDown } from "lucide-react";
 import type { Message, ChatSession } from "@shared/schema";
 import { AuthWrapper } from "@/components/AuthWrapper";
 import { AIStatusIndicator, AIThinkingVisualizer, FloatingParticles, TypingEffect } from "@/components/GimmickFeatures";
@@ -24,6 +24,8 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
   );
   const [showSidebar, setShowSidebar] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash");
+  const [showModelSelector, setShowModelSelector] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
@@ -154,6 +156,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
         role: "user",
         userId: user.uid,
         sessionId: currentSessionId,
+        model: selectedModel,
       });
       return response.json();
     },
@@ -216,6 +219,21 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
+  // Click outside to close dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showModelSelector || showProfile) {
+        setShowModelSelector(false);
+        setShowProfile(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showModelSelector, showProfile]);
+
   // Auto-resize textarea
   const adjustTextareaHeight = () => {
     if (textareaRef.current) {
@@ -253,6 +271,13 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
     const date = new Date(timestamp);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
+
+  const aiModels = [
+    { id: "gemini-1.5-flash", name: "Gemini Flash", description: "Cepat & Efisien" },
+    { id: "gemini-1.5-pro", name: "Gemini Pro", description: "Analisis Mendalam" },
+    { id: "claude-3-haiku", name: "Claude Haiku", description: "Kreatif & Responsif" },
+    { id: "gpt-4o-mini", name: "GPT-4o Mini", description: "Balanced Performance" }
+  ];
 
   const handleLogout = () => {
     if (process.env.NODE_ENV === 'development') {
@@ -353,6 +378,39 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                 </div>
               </div>
               <div className="flex items-center space-x-2">
+                <div className="relative">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowModelSelector(!showModelSelector)}
+                    className="text-xs"
+                  >
+                    <Bot className="w-3 h-3 mr-1" />
+                    {aiModels.find(m => m.id === selectedModel)?.name}
+                    <ChevronDown className="w-3 h-3 ml-1" />
+                  </Button>
+                  {showModelSelector && (
+                    <div className="absolute top-10 right-0 z-50 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-2">
+                      {aiModels.map((model) => (
+                        <div
+                          key={model.id}
+                          onClick={() => {
+                            setSelectedModel(model.id);
+                            setShowModelSelector(false);
+                          }}
+                          className={`p-3 rounded-lg cursor-pointer mb-1 transition-colors ${
+                            selectedModel === model.id
+                              ? "bg-blue-100 border border-blue-200"
+                              : "hover:bg-gray-100"
+                          }`}
+                        >
+                          <div className="font-medium text-sm">{model.name}</div>
+                          <div className="text-xs text-gray-500">{model.description}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <Button
                   variant="ghost"
                   size="sm"
