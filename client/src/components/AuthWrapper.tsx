@@ -87,13 +87,13 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
                 <span className="text-white text-4xl font-bold">M</span>
               </div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-3">
-                IntelliChat AI
+                MarioChat AI
               </h1>
               <p className="text-slate-600 text-lg mb-2">
-                Platform AI Chat dengan Multi-Model Support
+                Advanced Multi-Model AI Platform
               </p>
               <p className="text-slate-500 text-sm">
-                Powered by Advanced AI Technology
+                Powered by Gemini, GPT-4, Claude & More
               </p>
             </div>
 

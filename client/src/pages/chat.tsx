@@ -4,7 +4,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Bot, User, Settings, Trash2, Sparkles, Zap, MessageSquare, Plus, History, Menu, LogOut, Crown, UserCircle, FileText, Download, Copy, Image, Globe, Clock, Lightbulb, Folder, Mic, X, ChevronDown } from "lucide-react";
+import { Send, Trash2, Bot, User, Settings, LogOut, Sparkles, Zap, MessageSquare, Plus, History, Menu, Crown, UserCircle, FileText, Download, Copy, Image, Globe, Clock, Lightbulb, Folder, Mic, X, ChevronDown } from "lucide-react";
 import type { Message, ChatSession } from "@shared/schema";
 import { AuthWrapper } from "@/components/AuthWrapper";
 import { AIStatusIndicator, AIThinkingVisualizer, FloatingParticles, TypingEffect } from "@/components/GimmickFeatures";
