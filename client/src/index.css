@@ -497,6 +497,36 @@
   .prose h3 { font-size: 1.1em; }
 }
 
+/* Prevent zoom and improve mobile interaction */
+* {
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Disable zoom but keep pinch to zoom for accessibility */
+html {
+  touch-action: manipulation;
+}
+
+/* Improve mobile button interactions */
+button, input, textarea, select {
+  touch-action: manipulation;
+}
+
+/* Prevent text selection on UI elements */
+.ui-element {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+/* Allow text selection in message content */
+.message-content {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+}
+
 /* Touch optimization */
 .touch-manipulation {
   touch-action: manipulation;

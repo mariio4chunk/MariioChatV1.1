@@ -105,30 +105,48 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
     }
   };
 
-  const copyToClipboard = async (text: string) => {
+  const copyToClipboard = async (text: string, type: 'full' | 'code' = 'full') => {
     try {
-      await navigator.clipboard.writeText(text);
+      let contentToCopy = text;
+      
+      if (type === 'code') {
+        // Extract code blocks from markdown
+        const codeBlocks = text.match(/```[\s\S]*?```/g);
+        if (codeBlocks) {
+          contentToCopy = codeBlocks.map(block => 
+            block.replace(/```(\w+)?\n?/, '').replace(/```$/, '')
+          ).join('\n\n');
+        } else {
+          // Extract inline code
+          const inlineCode = text.match(/`([^`]+)`/g);
+          if (inlineCode) {
+            contentToCopy = inlineCode.map(code => code.replace(/`/g, '')).join('\n');
+          }
+        }
+      }
+      
+      await navigator.clipboard.writeText(contentToCopy);
       toast({
         title: "Berhasil!",
-        description: "Pesan berhasil disalin ke clipboard",
+        description: type === 'code' ? "Kode berhasil disalin" : "Pesan berhasil disalin ke clipboard",
       });
     } catch (error) {
       console.error('Failed to copy:', error);
       // Fallback for older browsers
       const textArea = document.createElement('textarea');
-      textArea.value = text;
+      textArea.value = contentToCopy;
       document.body.appendChild(textArea);
       textArea.select();
       try {
         document.execCommand('copy');
         toast({
           title: "Berhasil!",
-          description: "Pesan berhasil disalin ke clipboard",
+          description: type === 'code' ? "Kode berhasil disalin" : "Pesan berhasil disalin ke clipboard",
         });
       } catch (fallbackError) {
         toast({
           title: "Error",
-          description: "Gagal menyalin pesan ke clipboard",
+          description: "Gagal menyalin ke clipboard",
           variant: "destructive",
         });
       }
@@ -222,9 +240,16 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
   // Click outside to close dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (showModelSelector || showProfile) {
-        setShowModelSelector(false);
+      const target = event.target as Element;
+      
+      // Don't close if clicking inside the profile dropdown or its trigger
+      if (showProfile && !target.closest('[data-profile-dropdown]') && !target.closest('[data-profile-trigger]')) {
         setShowProfile(false);
+      }
+      
+      // Don't close if clicking inside the model selector or its trigger
+      if (showModelSelector && !target.closest('[data-model-dropdown]') && !target.closest('[data-model-trigger]')) {
+        setShowModelSelector(false);
       }
     };
 
@@ -283,10 +308,38 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
   };
 
   const aiModels = [
-    { id: "gemini-1.5-flash", name: "Gemini Flash", description: "Cepat & Efisien" },
-    { id: "gemini-1.5-pro", name: "Gemini Pro", description: "Analisis Mendalam" },
-    { id: "claude-3-haiku", name: "Claude Haiku", description: "Kreatif & Responsif" },
-    { id: "gpt-4o-mini", name: "GPT-4o Mini", description: "Balanced Performance" }
+    { 
+      id: "gemini-1.5-flash", 
+      name: "Gemini Flash", 
+      description: "Cepat & Efisien",
+      details: "Model tercepat dengan respons real-time. Cocok untuk percakapan umum, Q&A, dan tugas ringan. Token limit: 1M, multimodal support.",
+      strengths: ["Kecepatan tinggi", "Efisiensi cost", "Multimodal"],
+      useCase: "Chat umum, Q&A cepat"
+    },
+    { 
+      id: "gemini-1.5-pro", 
+      name: "Gemini Pro", 
+      description: "Analisis Mendalam",
+      details: "Model premium untuk analisis kompleks dan reasoning mendalam. Token limit: 2M, advanced multimodal, coding expertise.",
+      strengths: ["Analisis mendalam", "Reasoning kompleks", "Coding advanced"],
+      useCase: "Analisis data, coding, research"
+    },
+    { 
+      id: "claude-3-haiku", 
+      name: "Claude Haiku", 
+      description: "Kreatif & Responsif",
+      details: "Model Anthropic yang unggul dalam kreativitas dan nuanced conversation. Excellent safety features dan contextual understanding.",
+      strengths: ["Kreativitas tinggi", "Safety first", "Context awareness"],
+      useCase: "Creative writing, ethical AI"
+    },
+    { 
+      id: "gpt-4o-mini", 
+      name: "GPT-4o Mini", 
+      description: "Balanced Performance",
+      details: "OpenAI model dengan keseimbangan optimal antara performa dan cost. Strong reasoning dan general intelligence.",
+      strengths: ["Balance optimal", "General intelligence", "Reasoning"],
+      useCase: "General purpose, balanced tasks"
+    }
   ];
 
   const handleLogout = async () => {
@@ -403,13 +456,14 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                     size="sm"
                     onClick={() => setShowModelSelector(!showModelSelector)}
                     className="text-xs"
+                    data-model-trigger
                   >
                     <Bot className="w-3 h-3 mr-1" />
                     {aiModels.find(m => m.id === selectedModel)?.name}
                     <ChevronDown className="w-3 h-3 ml-1" />
                   </Button>
                   {showModelSelector && (
-                    <div className="absolute top-10 right-0 z-50 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-2">
+                    <div className="absolute top-10 right-0 z-50 w-80 bg-white rounded-lg shadow-lg border border-gray-200 p-2 max-h-96 overflow-y-auto" data-model-dropdown>
                       {aiModels.map((model) => (
                         <div
                           key={model.id}
@@ -417,14 +471,30 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                             setSelectedModel(model.id);
                             setShowModelSelector(false);
                           }}
-                          className={`p-3 rounded-lg cursor-pointer mb-1 transition-colors ${
+                          className={`p-4 rounded-lg cursor-pointer mb-2 transition-colors border ${
                             selectedModel === model.id
-                              ? "bg-blue-100 border border-blue-200"
-                              : "hover:bg-gray-100"
+                              ? "bg-blue-50 border-blue-200"
+                              : "hover:bg-gray-50 border-transparent"
                           }`}
                         >
-                          <div className="font-medium text-sm">{model.name}</div>
-                          <div className="text-xs text-gray-500">{model.description}</div>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="font-medium text-sm">{model.name}</div>
+                            {selectedModel === model.id && (
+                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            )}
+                          </div>
+                          <div className="text-xs text-gray-600 mb-2">{model.description}</div>
+                          <div className="text-xs text-gray-500 mb-2">{model.details}</div>
+                          <div className="flex flex-wrap gap-1 mb-1">
+                            {model.strengths.map((strength, idx) => (
+                              <span key={idx} className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                                {strength}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="text-xs text-gray-400">
+                            <strong>Best for:</strong> {model.useCase}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -442,6 +512,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowProfile(!showProfile)}
+                  data-profile-trigger
                 >
                   <UserCircle className="w-5 h-5" />
                 </Button>
@@ -509,16 +580,35 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                     ) : (
                       <div className="space-y-2">
                         <MarkdownMessage content={message.content} />
-                        <div className="flex items-center justify-between text-xs text-gray-500">
-                          <span>{formatTimestamp(message.createdAt)}</span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => copyToClipboard(message.content)}
-                            className="h-6 px-2"
-                          >
-                            <Copy className="w-3 h-3" />
-                          </Button>
+                        <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
+                          <div className="flex items-center space-x-2">
+                            <span>{formatTimestamp(message.createdAt)}</span>
+                            <span className="text-blue-600 font-medium">
+                              {aiModels.find(m => m.id === selectedModel)?.name}
+                            </span>
+                          </div>
+                          <div className="flex space-x-1">
+                            {message.content.includes('```') && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => copyToClipboard(message.content, 'code')}
+                                className="h-6 px-2"
+                                title="Copy code only"
+                              >
+                                <FileText className="w-3 h-3" />
+                              </Button>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => copyToClipboard(message.content, 'full')}
+                              className="h-6 px-2"
+                              title="Copy full message"
+                            >
+                              <Copy className="w-3 h-3" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -578,7 +668,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
 
         {/* Profile Dropdown */}
         {showProfile && (
-          <div className="fixed top-16 right-4 z-50 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-4">
+          <div className="fixed top-16 right-4 z-50 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-4" data-profile-dropdown>
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
                 <span className="text-white font-medium">
@@ -587,17 +677,24 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
               </div>
               <div>
                 <p className="font-medium text-gray-900">{user.displayName || 'User'}</p>
-                <p className="text-sm text-gray-500">{user.email}</p>
+                <p className="text-sm text-gray-500 truncate">{user.email}</p>
               </div>
             </div>
-            <Button
-              onClick={handleLogout}
-              variant="outline"
-              className="w-full"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
+            <div className="space-y-2">
+              <div className="text-xs text-gray-500 mb-2">
+                Current Model: <span className="font-medium text-blue-600">
+                  {aiModels.find(m => m.id === selectedModel)?.name}
+                </span>
+              </div>
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                className="w-full"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
         )}
       </div>
