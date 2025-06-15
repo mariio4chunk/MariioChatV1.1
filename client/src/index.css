@@ -106,6 +106,17 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .mobile-safe-area {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .mobile-input {
+    min-height: 44px; /* iOS minimum touch target */
+  }
+}
+
 /* Animation delays for typing indicator */
 .delay-200 {
   animation-delay: 0.2s;

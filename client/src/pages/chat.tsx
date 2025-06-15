@@ -128,26 +128,26 @@ export default function Chat() {
   return (
     <div className="min-h-screen flex flex-col bg-chat">
       {/* Header */}
-      <header className="bg-header border-b border-white/20 px-4 py-4 shadow-lg">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+      <header className="bg-header border-b border-white/20 px-3 py-3 shadow-lg sticky top-0 z-10">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
             <div className="relative">
-              <div className="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center shadow-lg">
-                <Sparkles className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 gradient-primary rounded-xl flex items-center justify-center shadow-lg">
+                <Sparkles className="w-4 h-4 text-white" />
               </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white flex items-center justify-center">
-                <Zap className="w-2 h-2 text-white" />
+              <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border border-white flex items-center justify-center">
+                <Zap className="w-1.5 h-1.5 text-white" />
               </div>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-textPrimary bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-lg font-bold text-textPrimary bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 IntelliChat AI
               </h1>
-              <p className="text-sm text-gray-600 font-medium">Powered by Advanced AI • v2.1</p>
+              <p className="text-xs text-gray-600 font-medium">Powered by Advanced AI • v2.1</p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <div className="flex items-center space-x-1 text-xs text-gray-500">
+          <div className="flex items-center space-x-1">
+            <div className="hidden sm:flex items-center space-x-1 text-xs text-gray-500">
               <div className="w-2 h-2 bg-green-400 rounded-full"></div>
               <span>Online</span>
             </div>
@@ -168,17 +168,17 @@ export default function Chat() {
       </header>
 
       {/* Chat Container */}
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
+      <div className="flex-1 flex flex-col w-full">
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
+        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4 max-w-4xl mx-auto w-full">
           {messages.length === 0 && (
-            <div className="flex items-start space-x-4">
-              <div className="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                <Sparkles className="w-5 h-5 text-white" />
+            <div className="flex items-start space-x-3">
+              <div className="w-8 h-8 gradient-primary rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                <Sparkles className="w-4 h-4 text-white" />
               </div>
               <div className="flex-1">
-                <div className="bg-aiResponse rounded-3xl rounded-tl-lg px-6 py-4 max-w-3xl message-shadow border border-white/30">
-                  <div className="flex items-center space-x-2 mb-2">
+                <div className="bg-aiResponse rounded-2xl rounded-tl-md px-4 py-3 message-shadow border border-white/30">
+                  <div className="flex items-center space-x-2 mb-1">
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                     <span className="text-xs font-semibold text-purple-600">IntelliChat AI</span>
                   </div>
@@ -188,7 +188,7 @@ export default function Chat() {
                     analisis data, menulis konten kreatif, dan diskusi mendalam. Mari mulai percakapan yang menarik!
                   </p>
                 </div>
-                <div className="mt-2 text-xs text-gray-500 px-6 flex items-center space-x-2">
+                <div className="mt-1 text-xs text-gray-500 px-4 flex items-center space-x-2">
                   <span>Baru saja</span>
                   <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
                   <span className="text-purple-500 font-medium">AI Ready</span>
@@ -205,30 +205,30 @@ export default function Chat() {
               }`}
             >
               {message.role === "assistant" && (
-                <div className="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                  <Sparkles className="w-5 h-5 text-white" />
+                <div className="w-8 h-8 gradient-primary rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <Sparkles className="w-4 h-4 text-white" />
                 </div>
               )}
               
               <div className={`flex-1 ${message.role === "user" ? "flex flex-col items-end" : ""}`}>
                 {message.role === "assistant" && (
-                  <div className="flex items-center space-x-2 mb-1 px-6">
+                  <div className="flex items-center space-x-2 mb-1 px-4">
                     <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                     <span className="text-xs font-semibold text-purple-600">IntelliChat AI</span>
                   </div>
                 )}
                 <div
-                  className={`rounded-3xl px-6 py-4 max-w-3xl message-shadow ${
+                  className={`rounded-2xl px-4 py-3 message-shadow ${
                     message.role === "user"
-                      ? "gradient-primary text-white rounded-tr-lg border border-purple-300/20"
-                      : "bg-aiResponse text-textPrimary rounded-tl-lg border border-white/30"
+                      ? "gradient-primary text-white rounded-tr-md border border-purple-300/20 max-w-xs sm:max-w-md"
+                      : "bg-aiResponse text-textPrimary rounded-tl-md border border-white/30 max-w-full"
                   }`}
                 >
                   <p className="text-sm leading-relaxed whitespace-pre-wrap">
                     {message.content}
                   </p>
                 </div>
-                <div className="mt-2 text-xs text-gray-500 px-6 flex items-center space-x-2">
+                <div className="mt-1 text-xs text-gray-500 px-4 flex items-center space-x-2">
                   <span>{formatTimestamp(message.timestamp)}</span>
                   {message.role === "assistant" && (
                     <>
@@ -240,8 +240,8 @@ export default function Chat() {
               </div>
 
               {message.role === "user" && (
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                  <User className="w-5 h-5 text-white" />
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <User className="w-4 h-4 text-white" />
                 </div>
               )}
             </div>
@@ -249,16 +249,16 @@ export default function Chat() {
 
           {/* Typing Indicator */}
           {isTyping && (
-            <div className="flex items-start space-x-4">
-              <div className="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                <Sparkles className="w-5 h-5 text-white animate-pulse" />
+            <div className="flex items-start space-x-3">
+              <div className="w-8 h-8 gradient-primary rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                <Sparkles className="w-4 h-4 text-white animate-pulse" />
               </div>
               <div className="flex-1">
-                <div className="flex items-center space-x-2 mb-1 px-6">
+                <div className="flex items-center space-x-2 mb-1 px-4">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                   <span className="text-xs font-semibold text-purple-600">IntelliChat AI</span>
                 </div>
-                <div className="bg-aiResponse rounded-3xl rounded-tl-lg px-6 py-4 max-w-xs message-shadow border border-white/30">
+                <div className="bg-aiResponse rounded-2xl rounded-tl-md px-4 py-3 max-w-xs message-shadow border border-white/30">
                   <div className="flex space-x-1 items-center">
                     <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
                     <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-200"></div>
@@ -266,7 +266,7 @@ export default function Chat() {
                     <span className="text-xs text-purple-600 ml-2 font-medium">Sedang mengetik...</span>
                   </div>
                 </div>
-                <div className="mt-2 text-xs text-gray-500 px-6 flex items-center space-x-2">
+                <div className="mt-1 text-xs text-gray-500 px-4 flex items-center space-x-2">
                   <span>AI sedang berpikir...</span>
                   <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
                   <span className="text-purple-500 font-medium">Processing</span>
@@ -278,65 +278,69 @@ export default function Chat() {
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Suggestions (positioned above input) */}
+        {messages.length === 0 && (
+          <div className="px-3 pb-2 max-w-4xl mx-auto w-full">
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                className="px-3 py-2 text-xs bg-white/60 hover:bg-white/80 text-purple-700 rounded-full h-auto border border-purple-200/50 font-medium transition-all duration-200 shadow-sm backdrop-blur-sm"
+                onClick={() => insertSuggestion("Ceritakan lelucon lucu")}
+              >
+                Ceritakan lelucon lucu
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="px-3 py-2 text-xs bg-white/60 hover:bg-white/80 text-blue-700 rounded-full h-auto border border-blue-200/50 font-medium transition-all duration-200 shadow-sm backdrop-blur-sm"
+                onClick={() => insertSuggestion("Jelaskan kecerdasan buatan")}
+              >
+                Jelaskan kecerdasan buatan
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="px-3 py-2 text-xs bg-white/60 hover:bg-white/80 text-pink-700 rounded-full h-auto border border-pink-200/50 font-medium transition-all duration-200 shadow-sm backdrop-blur-sm"
+                onClick={() => insertSuggestion("Buatkan puisi tentang teknologi")}
+              >
+                Buatkan puisi tentang teknologi
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Input Area */}
-        <div className="border-t border-white/20 bg-header px-4 py-6">
-          <div className="flex items-end space-x-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Textarea
-                  ref={textareaRef}
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Ketik pesan Anda di sini..."
-                  className="w-full px-6 py-4 pr-16 border border-purple-200/50 rounded-3xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none overflow-hidden min-h-[56px] max-h-32 text-sm text-textPrimary bg-white/80 backdrop-blur-sm shadow-lg placeholder:text-gray-500"
-                  rows={1}
-                />
-                <div className="absolute bottom-2 right-16 text-xs text-gray-400 font-medium">
-                  <span className={inputValue.length > 1800 ? "text-red-500" : inputValue.length > 1500 ? "text-amber-500" : "text-purple-500"}>
-                    {inputValue.length}
-                  </span>/2000
+        <div className="border-t border-white/20 bg-header px-3 py-3 sticky bottom-0 mobile-safe-area">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-end space-x-2">
+              <div className="flex-1">
+                <div className="relative">
+                  <Textarea
+                    ref={textareaRef}
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Ketik pesan Anda di sini..."
+                    className="w-full px-4 py-3 pr-12 border border-purple-200/50 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none overflow-hidden mobile-input max-h-32 text-sm text-textPrimary bg-white/90 backdrop-blur-sm shadow-md placeholder:text-gray-500"
+                    rows={1}
+                  />
+                  <div className="absolute bottom-1.5 right-12 text-xs text-gray-400 font-medium">
+                    <span className={inputValue.length > 1800 ? "text-red-500" : inputValue.length > 1500 ? "text-amber-500" : "text-purple-500"}>
+                      {inputValue.length}
+                    </span>/2000
+                  </div>
                 </div>
               </div>
               
-              {/* Suggestions */}
-              {messages.length === 0 && (
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="px-4 py-2 text-xs bg-gradient-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 text-purple-700 rounded-full h-auto border border-purple-200/50 font-medium transition-all duration-200 shadow-sm"
-                    onClick={() => insertSuggestion("Ceritakan lelucon lucu")}
-                  >
-                    ✨ Ceritakan lelucon lucu
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="px-4 py-2 text-xs bg-gradient-to-r from-blue-100 to-purple-100 hover:from-blue-200 hover:to-purple-200 text-blue-700 rounded-full h-auto border border-blue-200/50 font-medium transition-all duration-200 shadow-sm"
-                    onClick={() => insertSuggestion("Jelaskan kecerdasan buatan")}
-                  >
-                    🤖 Jelaskan kecerdasan buatan
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="px-4 py-2 text-xs bg-gradient-to-r from-pink-100 to-rose-100 hover:from-pink-200 hover:to-rose-200 text-pink-700 rounded-full h-auto border border-pink-200/50 font-medium transition-all duration-200 shadow-sm"
-                    onClick={() => insertSuggestion("Buatkan puisi tentang teknologi")}
-                  >
-                    📝 Buatkan puisi tentang teknologi
-                  </Button>
-                </div>
-              )}
+              <Button
+                onClick={handleSend}
+                disabled={!inputValue.trim() || sendMessageMutation.isPending}
+                className="gradient-primary hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-white p-3 rounded-xl transition-all duration-200 transform hover:scale-105 active:scale-95 border border-purple-300/20 mobile-input"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
             </div>
-            
-            <Button
-              onClick={handleSend}
-              disabled={!inputValue.trim() || sendMessageMutation.isPending}
-              className="gradient-primary hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-white p-4 rounded-2xl transition-all duration-200 transform hover:scale-105 active:scale-95 border border-purple-300/20"
-            >
-              <Send className="w-5 h-5" />
-            </Button>
           </div>
         </div>
       </div>
