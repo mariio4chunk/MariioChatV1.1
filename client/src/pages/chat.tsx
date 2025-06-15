@@ -333,9 +333,9 @@ export default function Chat() {
             <Button
               onClick={handleSend}
               disabled={!inputValue.trim() || sendMessageMutation.isPending}
-              className="bg-primary hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white p-3 rounded-xl transition-all duration-200 transform hover:scale-105 active:scale-95"
+              className="gradient-primary hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-white p-4 rounded-2xl transition-all duration-200 transform hover:scale-105 active:scale-95 border border-purple-300/20"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-5 h-5" />
             </Button>
           </div>
         </div>
