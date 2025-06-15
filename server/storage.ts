@@ -1,4 +1,6 @@
 import { users, messages, type User, type InsertUser, type Message, type InsertMessage } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -9,56 +11,43 @@ export interface IStorage {
   clearMessages(): Promise<void>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private messages: Map<number, Message>;
-  private currentUserId: number;
-  private currentMessageId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.messages = new Map();
-    this.currentUserId = 1;
-    this.currentMessageId = 1;
-  }
-
+export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
   async createMessage(insertMessage: InsertMessage): Promise<Message> {
-    const id = this.currentMessageId++;
-    const message: Message = { 
-      ...insertMessage, 
-      id,
-      timestamp: new Date()
-    };
-    this.messages.set(id, message);
+    const [message] = await db
+      .insert(messages)
+      .values(insertMessage)
+      .returning();
     return message;
   }
 
   async getMessages(): Promise<Message[]> {
-    return Array.from(this.messages.values()).sort((a, b) => 
-      a.timestamp.getTime() - b.timestamp.getTime()
-    );
+    return await db
+      .select()
+      .from(messages)
+      .orderBy(messages.timestamp);
   }
 
   async clearMessages(): Promise<void> {
-    this.messages.clear();
+    await db.delete(messages);
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

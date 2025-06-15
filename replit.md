@@ -19,8 +19,8 @@ This is a full-stack chat application built with React, Express.js, and TypeScri
 - **Language**: TypeScript with ES modules
 - **Database**: PostgreSQL with Drizzle ORM
 - **Database Provider**: Neon Database (serverless PostgreSQL)
-- **API Integration**: OpenAI-compatible client for Kluster AI
-- **Session Management**: Basic memory storage (development setup)
+- **API Integration**: Google Gemini AI client library
+- **Session Management**: PostgreSQL database with persistent storage
 
 ### Monorepo Structure
 ```
@@ -58,7 +58,7 @@ This is a full-stack chat application built with React, Express.js, and TypeScri
 1. **User Input**: User types message in textarea and submits
 2. **Frontend Validation**: Client validates message using Zod schema
 3. **API Request**: POST request sent to `/api/messages` endpoint
-4. **Message Storage**: User message saved to database
+4. **Message Storage**: User message saved to PostgreSQL database
 5. **AI Processing**: Server sends conversation history to Google Gemini AI
 6. **AI Response**: Assistant response received and stored in database
 7. **Frontend Update**: React Query invalidates cache and refetches messages
@@ -101,6 +101,7 @@ This is a full-stack chat application built with React, Express.js, and TypeScri
 ## Changelog
 - June 15, 2025. Initial setup with Kluster AI integration
 - June 15, 2025. Updated AI integration from Kluster AI to Google Gemini AI (Gemini-1.5-Flash model)
+- June 15, 2025. Added PostgreSQL database with Drizzle ORM, replaced memory storage with persistent database storage
 
 ## User Preferences
 
