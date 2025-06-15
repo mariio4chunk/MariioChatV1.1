@@ -375,95 +375,110 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      <div className="flex h-screen">
-        {/* Sidebar */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 overflow-hidden">
+      <div className="flex h-screen max-h-screen">
+        {/* Sidebar with improved mobile handling */}
         {showSidebar && (
-          <div className="fixed inset-0 z-50 lg:relative lg:inset-auto">
-            <div className="absolute inset-0 bg-black/50 lg:hidden" onClick={() => setShowSidebar(false)} />
-            <div className="relative w-80 h-full bg-white border-r border-gray-200 flex flex-col">
-              <div className="p-4 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <h2 className="font-semibold text-gray-900">Chat Sessions</h2>
+          <div className="fixed inset-0 z-50 lg:relative lg:inset-auto lg:z-auto">
+            <div 
+              className="absolute inset-0 bg-black/50 lg:hidden" 
+              onClick={() => setShowSidebar(false)} 
+            />
+            <div className="relative w-80 lg:w-72 xl:w-80 h-full bg-white/95 backdrop-blur-sm border-r border-gray-200 flex flex-col shadow-lg lg:shadow-none">
+              <div className="p-3 lg:p-4 border-b border-gray-200 bg-white/90">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="font-semibold text-gray-900 text-sm lg:text-base">Chat Sessions</h2>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowSidebar(false)}
-                    className="lg:hidden"
+                    className="lg:hidden h-8 w-8 p-0"
                   >
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
                 <Button
                   onClick={createNewChat}
-                  className="w-full mt-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 h-9 text-sm"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   New Chat
                 </Button>
               </div>
-              <div className="flex-1 overflow-y-auto p-4">
+              <div className="flex-1 overflow-y-auto p-2 lg:p-4 modern-scrollbar">
                 {chatSessions.map((session) => (
                   <div
                     key={session.sessionId}
                     onClick={() => switchToSession(session.sessionId)}
-                    className={`p-3 rounded-lg cursor-pointer mb-2 transition-colors ${
+                    className={`p-3 rounded-lg cursor-pointer mb-2 transition-all duration-200 ${
                       currentSessionId === session.sessionId
-                        ? "bg-blue-100 border border-blue-200"
-                        : "hover:bg-gray-100"
+                        ? "bg-blue-100 border border-blue-200 shadow-sm"
+                        : "hover:bg-gray-50 border border-transparent"
                     }`}
                   >
                     <div className="flex items-center space-x-2">
-                      <MessageSquare className="w-4 h-4 text-gray-500" />
+                      <MessageSquare className="w-4 h-4 text-gray-500 flex-shrink-0" />
                       <span className="text-sm font-medium text-gray-900 truncate">
                         {session.title}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 mt-1 ml-6">
                       {formatTimestamp(session.updatedAt)}
                     </p>
                   </div>
                 ))}
+                {chatSessions.length === 0 && (
+                  <div className="text-center py-8">
+                    <MessageSquare className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                    <p className="text-sm text-gray-500">Belum ada chat session</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         )}
 
-        {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col">
-          {/* Header */}
-          <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4">
+        {/* Main Chat Area with optimized layout */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Header with better responsive design */}
+          <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200 p-3 lg:p-4 sticky top-0 z-40">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 lg:space-x-3 min-w-0">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowSidebar(!showSidebar)}
+                  className="h-8 w-8 p-0 lg:h-9 lg:w-9"
                 >
-                  <Menu className="w-5 h-5" />
+                  <Menu className="w-4 h-4 lg:w-5 lg:h-5" />
                 </Button>
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                    <Bot className="w-4 h-4 text-white" />
+                <div className="flex items-center space-x-2 min-w-0">
+                  <div className="w-7 h-7 lg:w-8 lg:h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Bot className="w-3 h-3 lg:w-4 lg:h-4 text-white" />
                   </div>
-                  <h1 className="text-xl font-semibold text-gray-900">AI Chat</h1>
+                  <h1 className="text-lg lg:text-xl font-semibold text-gray-900 truncate">AI Chat</h1>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 lg:space-x-2">
                 <div className="relative">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setShowModelSelector(!showModelSelector)}
-                    className="text-xs"
+                    className="text-xs h-8 px-2 lg:px-3 hidden sm:flex"
                     data-model-trigger
                   >
                     <Bot className="w-3 h-3 mr-1" />
-                    {aiModels.find(m => m.id === selectedModel)?.name}
+                    <span className="hidden md:inline">
+                      {aiModels.find(m => m.id === selectedModel)?.name}
+                    </span>
+                    <span className="md:hidden">
+                      {aiModels.find(m => m.id === selectedModel)?.name.split(' ')[0]}
+                    </span>
                     <ChevronDown className="w-3 h-3 ml-1" />
                   </Button>
                   {showModelSelector && (
-                    <div className="absolute top-10 right-0 z-50 w-80 bg-white rounded-lg shadow-lg border border-gray-200 p-2 max-h-96 overflow-y-auto" data-model-dropdown>
+                    <div className="absolute top-10 right-0 z-50 w-72 sm:w-80 bg-white rounded-lg shadow-xl border border-gray-200 p-2 max-h-80 lg:max-h-96 overflow-y-auto modern-scrollbar" data-model-dropdown>
                       {aiModels.map((model) => (
                         <div
                           key={model.id}
@@ -471,9 +486,9 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                             setSelectedModel(model.id);
                             setShowModelSelector(false);
                           }}
-                          className={`p-4 rounded-lg cursor-pointer mb-2 transition-colors border ${
+                          className={`p-3 lg:p-4 rounded-lg cursor-pointer mb-2 transition-all duration-200 border ${
                             selectedModel === model.id
-                              ? "bg-blue-50 border-blue-200"
+                              ? "bg-blue-50 border-blue-200 shadow-sm"
                               : "hover:bg-gray-50 border-transparent"
                           }`}
                         >
@@ -484,9 +499,9 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                             )}
                           </div>
                           <div className="text-xs text-gray-600 mb-2">{model.description}</div>
-                          <div className="text-xs text-gray-500 mb-2">{model.details}</div>
+                          <div className="text-xs text-gray-500 mb-2 line-clamp-2">{model.details}</div>
                           <div className="flex flex-wrap gap-1 mb-1">
-                            {model.strengths.map((strength, idx) => (
+                            {model.strengths.slice(0, 2).map((strength, idx) => (
                               <span key={idx} className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
                                 {strength}
                               </span>
@@ -505,6 +520,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                   size="sm"
                   onClick={() => clearMessagesMutation.mutate()}
                   disabled={clearMessagesMutation.isPending}
+                  className="h-8 w-8 p-0 lg:h-9 lg:w-9"
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -513,187 +529,224 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                   size="sm"
                   onClick={() => setShowProfile(!showProfile)}
                   data-profile-trigger
+                  className="h-8 w-8 p-0 lg:h-9 lg:w-9"
                 >
-                  <UserCircle className="w-5 h-5" />
+                  <UserCircle className="w-4 h-4 lg:w-5 lg:h-5" />
                 </Button>
               </div>
             </div>
             <AIStatusIndicator />
           </div>
 
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {/* Messages Area with optimized layout */}
+          <div className="flex-1 overflow-y-auto px-3 py-4 lg:px-6 lg:py-6 space-y-4 modern-scrollbar">
             {messages.length === 0 ? (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center max-w-md">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Bot className="w-8 h-8 text-white" />
+              <div className="flex-1 flex items-center justify-center min-h-[calc(100vh-200px)]">
+                <div className="text-center max-w-sm lg:max-w-md px-4">
+                  <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Bot className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    Start a conversation
+                  <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-2">
+                    Mulai Percakapan
                   </h3>
-                  <p className="text-gray-600 text-sm mb-6">
-                    Ask me anything and I'll do my best to help you.
+                  <p className="text-gray-600 text-sm lg:text-base mb-6">
+                    Tanyakan apa saja dan saya akan membantu Anda sebaik mungkin.
                   </p>
-                  <div className="space-y-2">
+                  <div className="grid grid-cols-1 gap-2 lg:gap-3">
                     {[
-                      "Explain quantum computing",
-                      "Write a Python function",
-                      "Help me debug my code",
-                      "Create a website layout"
+                      "Jelaskan quantum computing",
+                      "Buatkan fungsi Python",
+                      "Bantu debug kode saya",
+                      "Buat layout website"
                     ].map((suggestion) => (
                       <Button
                         key={suggestion}
                         variant="outline"
                         onClick={() => insertSuggestion(suggestion)}
-                        className="w-full justify-start text-left"
+                        className="w-full justify-start text-left h-auto py-3 px-4 text-sm"
                       >
-                        <Lightbulb className="w-4 h-4 mr-2" />
-                        {suggestion}
+                        <Lightbulb className="w-4 h-4 mr-2 flex-shrink-0" />
+                        <span className="truncate">{suggestion}</span>
                       </Button>
                     ))}
                   </div>
                 </div>
               </div>
             ) : (
-              messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex space-x-3 ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  {message.role === "assistant" && (
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Bot className="w-4 h-4 text-white" />
-                    </div>
-                  )}
+              <div className="max-w-4xl mx-auto space-y-4">
+                {messages.map((message) => (
                   <div
-                    className={`max-w-3xl rounded-2xl px-4 py-3 ${
-                      message.role === "user"
-                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white"
-                        : "bg-white border border-gray-200 shadow-sm"
+                    key={message.id}
+                    className={`flex space-x-2 lg:space-x-3 ${
+                      message.role === "user" ? "justify-end" : "justify-start"
                     }`}
                   >
-                    {message.role === "user" ? (
-                      <p className="whitespace-pre-wrap">{message.content}</p>
-                    ) : (
-                      <div className="space-y-2">
-                        <MarkdownMessage content={message.content} />
-                        <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
-                          <div className="flex items-center space-x-2">
-                            <span>{formatTimestamp(message.createdAt)}</span>
-                            <span className="text-blue-600 font-medium">
-                              {aiModels.find(m => m.id === selectedModel)?.name}
-                            </span>
-                          </div>
-                          <div className="flex space-x-1">
-                            {message.content.includes('```') && (
+                    {message.role === "assistant" && (
+                      <div className="w-7 h-7 lg:w-8 lg:h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                        <Bot className="w-3 h-3 lg:w-4 lg:h-4 text-white" />
+                      </div>
+                    )}
+                    <div
+                      className={`max-w-[85%] lg:max-w-3xl rounded-2xl px-3 py-2 lg:px-4 lg:py-3 ${
+                        message.role === "user"
+                          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white"
+                          : "bg-white border border-gray-200 shadow-sm"
+                      }`}
+                    >
+                      {message.role === "user" ? (
+                        <p className="whitespace-pre-wrap text-sm lg:text-base">{message.content}</p>
+                      ) : (
+                        <div className="space-y-2">
+                          <MarkdownMessage content={message.content} />
+                          <div className="flex items-center justify-between text-xs text-gray-500 mt-2 pt-2 border-t border-gray-100">
+                            <div className="flex items-center space-x-2">
+                              <Clock className="w-3 h-3" />
+                              <span>{formatTimestamp(message.createdAt)}</span>
+                              <span className="text-blue-600 font-medium">
+                                {aiModels.find(m => m.id === selectedModel)?.name}
+                              </span>
+                            </div>
+                            <div className="flex space-x-1">
+                              {message.content.includes('```') && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => copyToClipboard(message.content, 'code')}
+                                  className="h-6 px-2 hover:bg-gray-100"
+                                  title="Salin kode saja"
+                                >
+                                  <FileText className="w-3 h-3" />
+                                </Button>
+                              )}
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => copyToClipboard(message.content, 'code')}
-                                className="h-6 px-2"
-                                title="Copy code only"
+                                onClick={() => copyToClipboard(message.content, 'full')}
+                                className="h-6 px-2 hover:bg-gray-100"
+                                title="Salin seluruh pesan"
                               >
-                                <FileText className="w-3 h-3" />
+                                <Copy className="w-3 h-3" />
                               </Button>
-                            )}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => copyToClipboard(message.content, 'full')}
-                              className="h-6 px-2"
-                              title="Copy full message"
-                            >
-                              <Copy className="w-3 h-3" />
-                            </Button>
+                            </div>
                           </div>
                         </div>
+                      )}
+                    </div>
+                    {message.role === "user" && (
+                      <div className="w-7 h-7 lg:w-8 lg:h-8 bg-gradient-to-br from-gray-600 to-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                        <User className="w-3 h-3 lg:w-4 lg:h-4 text-white" />
                       </div>
                     )}
                   </div>
-                  {message.role === "user" && (
-                    <div className="w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <User className="w-4 h-4 text-white" />
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
+                ))}
 
-            {isTyping && (
-              <div className="flex space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                  <Bot className="w-4 h-4 text-white" />
-                </div>
-                <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-sm">
-                  <AIThinkingVisualizer />
-                </div>
+                {isTyping && (
+                  <div className="flex space-x-2 lg:space-x-3">
+                    <div className="w-7 h-7 lg:w-8 lg:h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                      <Bot className="w-3 h-3 lg:w-4 lg:h-4 text-white" />
+                    </div>
+                    <div className="bg-white border border-gray-200 rounded-2xl px-3 py-2 lg:px-4 lg:py-3 shadow-sm">
+                      <AIThinkingVisualizer />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Area */}
-          <div className="border-t border-gray-200 bg-white p-4">
+          {/* Input Area with better mobile optimization */}
+          <div className="border-t border-gray-200 bg-white/95 backdrop-blur-sm p-3 lg:p-4 mobile-safe-area">
             <div className="max-w-4xl mx-auto">
-              <div className="flex space-x-3">
+              {/* Model selector for mobile */}
+              <div className="sm:hidden mb-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowModelSelector(!showModelSelector)}
+                  className="text-xs h-8 w-full"
+                  data-model-trigger
+                >
+                  <Bot className="w-3 h-3 mr-2" />
+                  {aiModels.find(m => m.id === selectedModel)?.name}
+                  <ChevronDown className="w-3 h-3 ml-auto" />
+                </Button>
+              </div>
+
+              <div className="flex space-x-2 lg:space-x-3">
                 <div className="flex-1 relative">
                   <Textarea
                     ref={textareaRef}
                     value={inputValue}
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
-                    placeholder="Type your message..."
-                    className="min-h-[48px] max-h-32 resize-none pr-12 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Ketik pesan Anda..."
+                    className="min-h-[44px] lg:min-h-[48px] max-h-32 resize-none pr-12 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm lg:text-base mobile-input"
                     disabled={sendMessageMutation.isPending}
                   />
                   <Button
                     onClick={handleSend}
                     disabled={!inputValue.trim() || sendMessageMutation.isPending}
                     size="sm"
-                    className="absolute right-2 bottom-2 h-8 w-8 p-0 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                    className="absolute right-2 bottom-2 h-7 w-7 lg:h-8 lg:w-8 p-0 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 touch-manipulation"
                   >
-                    <Send className="w-4 h-4" />
+                    <Send className="w-3 h-3 lg:w-4 lg:h-4" />
                   </Button>
                 </div>
               </div>
-              <p className="text-xs text-gray-500 mt-2 text-center">
-                Press Enter to send, Shift+Enter for new line
-              </p>
+              <div className="flex items-center justify-between mt-2">
+                <p className="text-xs text-gray-500">
+                  Enter kirim, Shift+Enter baris baru
+                </p>
+                <div className="text-xs text-gray-400">
+                  {inputValue.length}/4000
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Profile Dropdown */}
+        {/* Profile Dropdown with improved design */}
         {showProfile && (
-          <div className="fixed top-16 right-4 z-50 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-4" data-profile-dropdown>
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-medium">
-                  {user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}
-                </span>
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">{user.displayName || 'User'}</p>
-                <p className="text-sm text-gray-500 truncate">{user.email}</p>
+          <div className="fixed top-14 lg:top-16 right-2 lg:right-4 z-50 w-72 lg:w-80 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden" data-profile-dropdown>
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                  <span className="text-white font-semibold text-lg">
+                    {user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}
+                  </span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-white truncate">{user.displayName || 'User'}</p>
+                  <p className="text-blue-100 text-sm truncate">{user.email}</p>
+                </div>
               </div>
             </div>
-            <div className="space-y-2">
-              <div className="text-xs text-gray-500 mb-2">
-                Current Model: <span className="font-medium text-blue-600">
-                  {aiModels.find(m => m.id === selectedModel)?.name}
-                </span>
+            
+            <div className="p-4 space-y-4">
+              <div className="bg-blue-50 rounded-lg p-3">
+                <div className="text-xs text-gray-600 mb-1">Model Aktif:</div>
+                <div className="flex items-center space-x-2">
+                  <Bot className="w-4 h-4 text-blue-600" />
+                  <span className="font-medium text-blue-800">
+                    {aiModels.find(m => m.id === selectedModel)?.name}
+                  </span>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {aiModels.find(m => m.id === selectedModel)?.description}
+                </div>
               </div>
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                className="w-full"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
+
+              <div className="border-t pt-3">
+                <Button
+                  onClick={handleLogout}
+                  variant="outline"
+                  className="w-full hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-colors"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
+              </div>
             </div>
           </div>
         )}
