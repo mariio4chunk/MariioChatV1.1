@@ -573,8 +573,8 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
             </div>
           </div>
         </div>
+        </div>
       </div>
-    </div>
     </div>
   );
 }
