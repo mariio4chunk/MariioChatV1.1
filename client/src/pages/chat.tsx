@@ -440,7 +440,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
       {showSidebar && (
         <div className="fixed inset-0 z-50 lg:hidden animate-in fade-in-0 duration-200">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setShowSidebar(false)} />
-          <div className="absolute left-0 top-0 h-full w-80 max-w-[85vw] bg-white/95 backdrop-blur-xl shadow-2xl border-r border-white/20 animate-in slide-in-from-left duration-300"></div>
+          <div className="absolute left-0 top-0 h-full w-80 max-w-[85vw] bg-white/95 backdrop-blur-xl shadow-2xl border-r border-white/20 animate-in slide-in-from-left duration-300 flex flex-col">
             {/* Sidebar Header */}
             <div className="p-4 border-b border-purple-100 bg-gradient-to-r from-purple-50 to-pink-50">
               <div className="flex items-center justify-between mb-3">
@@ -469,7 +469,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
             </div>
 
             {/* Chat Sessions */}
-            <div className="flex-1 overflow-y-auto p-4 max-h-[60vh]">
+            <div className="flex-1 overflow-y-auto p-4">
               <div className="space-y-1">
                 {chatSessions.map((session) => (
                   <Button
@@ -581,10 +581,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
           </div>
         </div>
         
-        {/* AI Status Indicator - Hidden on mobile for space */}
-        <div className="mt-3 sm:mt-4 max-w-6xl mx-auto w-full hidden sm:block">
-          <AIStatusIndicator />
-        </div>
+        
       </header>
 
       {/* Chat Container */}
@@ -684,29 +681,33 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
             </div>
           ))}
 
-          {/* Typing Indicator */}
+          {/* AI Thinking Indicator */}
           {isTyping && (
             <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 gradient-primary rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
-                <Sparkles className="w-4 h-4 text-white animate-pulse" />
+              <div className="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                <Sparkles className="w-5 h-5 text-white animate-pulse" />
               </div>
               <div className="flex-1">
-                <div className="flex items-center space-x-2 mb-1 px-4">
+                <div className="flex items-center space-x-2 mb-2 px-4">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-xs font-semibold text-purple-600">IntelliChat AI</span>
+                  <span className="text-sm font-semibold text-purple-600">Mario AI</span>
+                  <span className="text-xs text-gray-500">sedang berpikir...</span>
                 </div>
-                <div className="bg-aiResponse rounded-2xl rounded-tl-md px-4 py-3 max-w-xs message-shadow border border-white/30">
-                  <div className="flex space-x-1 items-center">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-200"></div>
-                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-500"></div>
-                    <span className="text-xs text-purple-600 ml-2 font-medium">Sedang mengetik...</span>
+                <div className="bg-aiResponse rounded-2xl rounded-tl-md px-5 py-4 max-w-sm message-shadow border border-white/30">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-100"></div>
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-200"></div>
+                    </div>
+                    <span className="text-sm text-purple-700 font-medium">AI sedang menganalisis...</span>
                   </div>
-                </div>
-                <div className="mt-1 text-xs text-gray-500 px-4 flex items-center space-x-2">
-                  <span>AI sedang berpikir...</span>
-                  <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-                  <span className="text-purple-500 font-medium">Processing</span>
+                  <div className="mt-2 flex items-center space-x-2 text-xs text-gray-600">
+                    <div className="w-4 h-1 bg-purple-200 rounded-full overflow-hidden">
+                      <div className="w-full h-full bg-purple-400 rounded-full animate-pulse"></div>
+                    </div>
+                    <span>Memproses respons</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -715,37 +716,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Suggestions (positioned above input) */}
-        {messages.length === 0 && (
-          <div className="px-4 pb-3 max-w-6xl mx-auto w-full">
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                className="px-3 py-2 text-xs bg-white/60 hover:bg-white/80 text-purple-700 rounded-full h-auto border border-purple-200/50 font-medium transition-all duration-200 shadow-sm backdrop-blur-sm"
-                onClick={() => insertSuggestion("Ceritakan lelucon lucu")}
-              >
-                Ceritakan lelucon lucu
-              </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                className="px-3 py-2 text-xs bg-white/60 hover:bg-white/80 text-blue-700 rounded-full h-auto border border-blue-200/50 font-medium transition-all duration-200 shadow-sm backdrop-blur-sm"
-                onClick={() => insertSuggestion("Jelaskan kecerdasan buatan")}
-              >
-                Jelaskan kecerdasan buatan
-              </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                className="px-3 py-2 text-xs bg-white/60 hover:bg-white/80 text-pink-700 rounded-full h-auto border border-pink-200/50 font-medium transition-all duration-200 shadow-sm backdrop-blur-sm"
-                onClick={() => insertSuggestion("Buatkan puisi tentang teknologi")}
-              >
-                Buatkan puisi tentang teknologi
-              </Button>
-            </div>
-          </div>
-        )}
+        
 
         {/* Suggestions */}
         {messages.length === 0 && !isTyping && (
@@ -814,32 +785,84 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
 
             <div className="flex items-end space-x-2 sm:space-x-3">
               <div className="flex-1">
+                {/* AI Tools Row */}
+                <div className="flex items-center space-x-2 mb-3 px-1">
+                  <div className="flex items-center space-x-1 text-xs text-gray-600">
+                    <Sparkles className="w-3 h-3 text-purple-500" />
+                    <span className="font-medium">AI Tools:</span>
+                  </div>
+                  <div className="flex items-center space-x-1 overflow-x-auto scrollbar-hide">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="px-2 py-1 h-auto text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg border border-purple-200/50 whitespace-nowrap"
+                      onClick={() => insertSuggestion("Analisis teks ini: ")}
+                    >
+                      📊 Analisis
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="px-2 py-1 h-auto text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg border border-blue-200/50 whitespace-nowrap"
+                      onClick={() => insertSuggestion("Rangkum konten ini: ")}
+                    >
+                      📝 Rangkum
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="px-2 py-1 h-auto text-xs bg-green-50 hover:bg-green-100 text-green-700 rounded-lg border border-green-200/50 whitespace-nowrap"
+                      onClick={() => insertSuggestion("Jelaskan seperti untuk anak 5 tahun: ")}
+                    >
+                      🧠 Sederhana
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="px-2 py-1 h-auto text-xs bg-pink-50 hover:bg-pink-100 text-pink-700 rounded-lg border border-pink-200/50 whitespace-nowrap"
+                      onClick={() => insertSuggestion("Buatkan kode untuk: ")}
+                    >
+                      💻 Koding
+                    </Button>
+                  </div>
+                </div>
+
                 <div className="relative">
                   <Textarea
                     ref={textareaRef}
                     value={inputValue}
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
-                    placeholder="Tanyakan apa saja kepada Mario AI..."
-                    className="w-full px-3 sm:px-4 py-3 sm:py-4 pr-12 sm:pr-16 border-2 border-purple-200/50 rounded-2xl focus:ring-2 focus:ring-purple-400 focus:border-purple-400 resize-none overflow-hidden mobile-input max-h-32 text-sm text-textPrimary bg-white/95 backdrop-blur-sm shadow-lg placeholder:text-gray-500 transition-all duration-200"
+                    placeholder="Tanyakan apa saja kepada Mario AI... Gunakan AI Tools di atas untuk bantuan cepat!"
+                    className="w-full px-4 py-4 pr-16 border-2 border-purple-200/50 rounded-2xl focus:ring-2 focus:ring-purple-400 focus:border-purple-400 resize-none overflow-hidden mobile-input max-h-32 text-sm text-textPrimary bg-white/95 backdrop-blur-sm shadow-lg placeholder:text-gray-500 transition-all duration-200"
                     rows={1}
                   />
-                  <div className="absolute bottom-2 right-12 sm:right-16 text-xs font-medium hidden sm:block">
+                  
+                  {/* Character Count */}
+                  <div className="absolute bottom-2 right-16 text-xs font-medium hidden sm:block">
                     <span className={inputValue.length > 1800 ? "text-red-500" : inputValue.length > 1500 ? "text-amber-500" : "text-purple-500"}>
                       {inputValue.length}
                     </span>
                     <span className="text-gray-400">/2000</span>
                   </div>
+                  
+                  {/* Clear Button */}
                   {inputValue.trim() && (
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setInputValue("")}
-                      className="absolute bottom-2 right-2 p-1 h-6 w-6 rounded-full hover:bg-gray-100"
+                      className="absolute bottom-2 right-2 p-1 h-6 w-6 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600"
                     >
-                      <span className="text-gray-400 text-xs">×</span>
+                      ×
                     </Button>
                   )}
+                  
+                  {/* AI Enhancement Indicator */}
+                  <div className="absolute top-2 right-2 hidden sm:flex items-center space-x-1 text-xs text-purple-600">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="font-medium">Enhanced</span>
+                  </div>
                 </div>
               </div>
               

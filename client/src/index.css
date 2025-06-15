@@ -191,6 +191,26 @@
   background: var(--primary);
 }
 
+/* Scrollbar utilities */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile input improvements */
+.mobile-input {
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+}
+
+.mobile-safe-area {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 /* Enhanced markdown styling */
 .prose {
   max-width: none;
