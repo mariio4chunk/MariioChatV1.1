@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth, signInWithGoogle } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
-import { Bot, Chrome, LogIn } from "lucide-react";
+import { Bot, LogIn, Loader2 } from "lucide-react";
 
 interface AuthWrapperProps {
   children: (user: User | null) => React.ReactNode;
@@ -12,18 +12,9 @@ interface AuthWrapperProps {
 export function AuthWrapper({ children }: AuthWrapperProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [signingIn, setSigningIn] = useState(false);
 
   useEffect(() => {
-    // For development, check if we have a demo user in localStorage
-    if (process.env.NODE_ENV === 'development') {
-      const demoUser = localStorage.getItem('demoUser');
-      if (demoUser) {
-        setUser(JSON.parse(demoUser) as User);
-      }
-      setLoading(false);
-      return;
-    }
-
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
@@ -33,32 +24,33 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
   }, []);
 
   const handleGoogleSignIn = async () => {
+    if (signingIn) return;
+    
     try {
+      setSigningIn(true);
       const result = await signInWithGoogle();
-      if (!result) {
-        return;
-      }
-      
-      // For development, store in localStorage
-      if (process.env.NODE_ENV === 'development') {
-        localStorage.setItem('demoUser', JSON.stringify(result));
-        setUser(result as User);
+      if (result) {
+        setUser(result);
       }
     } catch (error) {
       console.error("Google sign in error:", error);
+    } finally {
+      setSigningIn(false);
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg animate-pulse">
-            <Bot className="w-8 h-8 text-white" />
+          <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl animate-pulse">
+            <Bot className="w-10 h-10 text-white" />
           </div>
-          <div className="space-y-2">
-            <div className="w-24 h-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full mx-auto animate-pulse"></div>
-            <p className="text-gray-600 font-medium">Loading Mario AI...</p>
+          <div className="space-y-3">
+            <div className="flex justify-center">
+              <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+            </div>
+            <p className="text-slate-600 font-medium text-lg">Memuat Mario AI...</p>
           </div>
         </div>
       </div>
@@ -67,29 +59,41 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center px-4">
         <div className="w-full max-w-md">
-          <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl border border-white/20 p-8">
+          <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 p-8">
             <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <span className="text-white text-3xl font-bold">M</span>
+              <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl">
+                <span className="text-white text-4xl font-bold">M</span>
               </div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3">
-                Welcome to Mario AI
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-3">
+                Selamat Datang di Mario AI
               </h1>
-              <p className="text-gray-600 text-lg">Masuk untuk memulai percakapan AI</p>
+              <p className="text-slate-600 text-lg">Masuk dengan akun Google untuk memulai</p>
             </div>
 
             <Button
               onClick={handleGoogleSignIn}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 rounded-xl font-medium flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              disabled={signingIn}
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-blue-400 disabled:to-indigo-400 text-white py-4 rounded-xl font-medium flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:transform-none disabled:hover:scale-100"
             >
-              <LogIn className="w-6 h-6" />
-              <span className="text-lg">Masuk dengan Google</span>
+              {signingIn ? (
+                <>
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                  <span className="text-lg">Sedang masuk...</span>
+                </>
+              ) : (
+                <>
+                  <LogIn className="w-6 h-6" />
+                  <span className="text-lg">Masuk dengan Google</span>
+                </>
+              )}
             </Button>
             
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-500">Autentikasi aman dengan Google</p>
+              <p className="text-sm text-slate-500">
+                Autentikasi aman menggunakan Firebase & Google
+              </p>
             </div>
           </div>
         </div>
