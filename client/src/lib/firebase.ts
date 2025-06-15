@@ -2,14 +2,14 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 
-// Firebase configuration - pastikan konfigurasi ini benar
+// Firebase configuration - menggunakan environment variables untuk keamanan
 const firebaseConfig = {
-  apiKey: "AIzaSyB5O8X6Z5cq9X5Bc4VjQm3L9m4Zr8h2Y6k",
-  authDomain: "mariio-chatt.firebaseapp.com",
-  projectId: "mariio-chatt",
-  storageBucket: "mariio-chatt.appspot.com",
-  messagingSenderId: "103941801706941889256",
-  appId: "1:103941801706941889256:web:5b8e8c6f7d9e0a1b2c3d4e"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyB5O8X6Z5cq9X5Bc4VjQm3L9m4Zr8h2Y6k",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "mariio-chatt.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "mariio-chatt",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "mariio-chatt.appspot.com",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "103941801706941889256",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:103941801706941889256:web:5b8e8c6f7d9e0a1b2c3d4e"
 };
 
 // Initialize Firebase
