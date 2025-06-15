@@ -313,9 +313,9 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
 
       {/* Profile Modal */}
       {showProfile && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowProfile(false)} />
-          <div className="relative bg-white rounded-3xl shadow-2xl p-8 m-4 max-w-md w-full">
+          <div className="relative bg-white rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="text-center">
               <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden shadow-lg">
                 <img
@@ -375,43 +375,87 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
       {/* Mobile Sidebar */}
       {showSidebar && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setShowSidebar(false)} />
-          <div className="absolute left-0 top-0 h-full w-80 bg-white shadow-xl">
-            <div className="p-4 border-b">
-              <div className="flex items-center justify-between">
-                <h2 className="font-semibold text-gray-800">Mario AI</h2>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowSidebar(false)} />
+          <div className="absolute left-0 top-0 h-full w-80 max-w-[85vw] bg-white shadow-xl">
+            {/* Sidebar Header */}
+            <div className="p-4 border-b border-purple-100 bg-gradient-to-r from-purple-50 to-pink-50">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 gradient-primary rounded-xl flex items-center justify-center">
+                    <Crown className="w-4 h-4 text-white" />
+                  </div>
+                  <h2 className="font-bold text-gray-800 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Mario AI</h2>
+                </div>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowSidebar(false)}
-                  className="p-1"
+                  className="p-2 hover:bg-purple-100 rounded-xl"
                 >
-                  ×
+                  <span className="text-xl text-gray-600">×</span>
                 </Button>
               </div>
-            </div>
-            <div className="p-4">
               <Button
                 onClick={createNewChat}
-                className="w-full mb-4 gradient-primary text-white rounded-xl"
+                className="w-full gradient-primary text-white rounded-xl py-2.5 font-medium"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Chat Baru
               </Button>
-              <div className="space-y-2">
+            </div>
+
+            {/* Chat Sessions */}
+            <div className="flex-1 overflow-y-auto p-4 max-h-[60vh]">
+              <div className="space-y-1">
                 {chatSessions.map((session) => (
                   <Button
                     key={session.sessionId}
                     variant={session.sessionId === currentSessionId ? "secondary" : "ghost"}
                     onClick={() => switchToSession(session.sessionId)}
-                    className="w-full justify-start text-left p-3 rounded-xl"
+                    className="w-full justify-start text-left p-3 rounded-xl hover:bg-purple-50 transition-colors duration-200"
                   >
-                    <MessageSquare className="w-4 h-4 mr-2" />
-                    <div className="truncate">
+                    <MessageSquare className="w-4 h-4 mr-3 text-purple-600" />
+                    <div className="truncate text-sm">
                       {session.title || `Chat ${session.sessionId.slice(0, 8)}...`}
                     </div>
                   </Button>
                 ))}
+                {chatSessions.length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    <MessageSquare className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                    <p className="text-sm">Belum ada riwayat chat</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Mobile Sidebar Footer */}
+            <div className="p-4 border-t border-purple-100 bg-gray-50">
+              <div className="space-y-2">
+                <Button
+                  onClick={() => {
+                    setShowProfile(true);
+                    setShowSidebar(false);
+                  }}
+                  variant="ghost"
+                  className="w-full justify-start p-3 rounded-xl hover:bg-purple-50 transition-colors duration-200"
+                >
+                  <UserCircle className="w-4 h-4 mr-3 text-purple-600" />
+                  <div className="flex-1 text-left">
+                    <div className="text-sm font-medium text-gray-700 truncate">
+                      {user.displayName}
+                    </div>
+                    <div className="text-xs text-gray-500">View Profile</div>
+                  </div>
+                </Button>
+                <Button
+                  onClick={() => logout()}
+                  variant="ghost"
+                  className="w-full justify-start p-3 rounded-xl hover:bg-red-50 text-red-600 transition-colors duration-200"
+                >
+                  <LogOut className="w-4 h-4 mr-3" />
+                  <span className="text-sm">Sign Out</span>
+                </Button>
               </div>
             </div>
           </div>
@@ -421,34 +465,35 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-      <header className="bg-header border-b border-white/20 px-4 py-4 shadow-lg sticky top-0 z-10">
+      <header className="bg-header border-b border-white/20 px-3 sm:px-4 py-3 sm:py-4 shadow-lg sticky top-0 z-10">
         <div className="flex items-center justify-between max-w-6xl mx-auto w-full">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4 flex-1 min-w-0">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowSidebar(true)}
-              className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl lg:hidden"
+              className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl lg:hidden flex-shrink-0"
             >
-              <History className="w-4 h-4" />
+              <Menu className="w-4 h-4" />
             </Button>
-            <div className="relative">
-              <div className="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center shadow-lg">
-                <Sparkles className="w-5 h-5 text-white" />
+            <div className="relative flex-shrink-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 gradient-primary rounded-2xl flex items-center justify-center shadow-lg">
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white flex items-center justify-center">
-                <Zap className="w-2 h-2 text-white" />
+              <div className="absolute -top-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 bg-green-400 rounded-full border-2 border-white flex items-center justify-center">
+                <Zap className="w-1.5 h-1.5 sm:w-2 sm:h-2 text-white" />
               </div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-textPrimary bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-lg sm:text-xl font-bold text-textPrimary bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent truncate">
                 Mario AI
               </h1>
-              <p className="text-sm text-gray-600 font-medium">Powered by Gemini AI • Enhanced Edition</p>
+              <p className="text-xs sm:text-sm text-gray-600 font-medium hidden sm:block">Powered by Gemini AI • Enhanced Edition</p>
+              <p className="text-xs text-gray-600 font-medium sm:hidden">AI Enhanced</p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <div className="hidden sm:flex items-center space-x-2 bg-green-50 px-3 py-1 rounded-full">
+          <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
+            <div className="hidden sm:flex items-center space-x-2 bg-green-50 px-2 sm:px-3 py-1 rounded-full">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
               <span className="text-xs font-medium text-green-700">Online</span>
             </div>
@@ -456,7 +501,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
               variant="ghost"
               size="sm"
               onClick={() => setShowProfile(true)}
-              className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-200"
+              className="p-1.5 sm:p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-200"
             >
               <UserCircle className="w-4 h-4" />
             </Button>
@@ -465,18 +510,15 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
               size="sm"
               onClick={() => clearMessagesMutation.mutate()}
               disabled={clearMessagesMutation.isPending}
-              className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-200"
+              className="p-1.5 sm:p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-200 hidden sm:flex"
             >
               <Trash2 className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="sm" className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-200">
-              <Settings className="w-4 h-4" />
             </Button>
           </div>
         </div>
         
-        {/* AI Status Indicator */}
-        <div className="mt-4 max-w-6xl mx-auto w-full">
+        {/* AI Status Indicator - Hidden on mobile for space */}
+        <div className="mt-3 sm:mt-4 max-w-6xl mx-auto w-full hidden sm:block">
           <AIStatusIndicator />
         </div>
       </header>
@@ -484,7 +526,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
       {/* Chat Container */}
       <div className="flex-1 flex flex-col w-full">
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 max-w-6xl mx-auto w-full">
+        <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 max-w-6xl mx-auto w-full">
           {messages.length === 0 && (
             <div className="flex items-start space-x-3">
               <div className="w-8 h-8 gradient-primary rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
@@ -643,18 +685,18 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
 
         {/* Suggestions */}
         {messages.length === 0 && !isTyping && (
-          <div className="px-4 pb-6 max-w-6xl mx-auto w-full">
+          <div className="px-3 sm:px-4 pb-4 sm:pb-6 max-w-6xl mx-auto w-full">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {[
                 "Ceritakan lelucon lucu tentang teknologi",
-                "Jelaskan kecerdasan buatan dengan sederhana",
+                "Jelaskan kecerdasan buatan dengan sederhana", 
                 "Buatkan puisi tentang teknologi",
                 "Bagaimana cara belajar programming?"
               ].map((suggestion, index) => (
                 <button
                   key={index}
                   onClick={() => insertSuggestion(suggestion)}
-                  className="p-3 text-left text-sm text-gray-600 bg-white/60 hover:bg-white/80 rounded-xl border border-purple-100 hover:border-purple-200 transition-all duration-200 hover:shadow-md"
+                  className="p-3 text-left text-sm text-gray-600 bg-white/60 hover:bg-white/80 rounded-xl border border-purple-100 hover:border-purple-200 transition-all duration-200 hover:shadow-md active:scale-95 transform touch-manipulation"
                 >
                   {suggestion}
                 </button>
@@ -664,10 +706,30 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
         )}
 
         {/* Input Area */}
-        <div className="border-t border-white/20 bg-gradient-to-b from-white/50 to-white/80 backdrop-blur-sm px-4 py-6 sticky bottom-0 mobile-safe-area">
+        <div className="border-t border-white/20 bg-gradient-to-b from-white/50 to-white/80 backdrop-blur-sm px-3 sm:px-4 py-3 sm:py-6 sticky bottom-0 mobile-safe-area">
           <div className="max-w-6xl mx-auto">
-            {/* Quick Actions */}
-            <div className="flex items-center space-x-2 mb-3 overflow-x-auto">
+            {/* Quick Actions - Mobile optimized */}
+            <div className="flex items-center space-x-2 mb-3 overflow-x-auto scrollbar-hide lg:hidden">
+              {[
+                { icon: Plus, label: "Baru", action: createNewChat },
+                { icon: History, label: "Riwayat", action: () => setShowSidebar(true) },
+                { icon: Trash2, label: "Hapus", action: () => clearMessagesMutation.mutate() }
+              ].map((item, index) => (
+                <Button
+                  key={index}
+                  variant="ghost"
+                  size="sm"
+                  onClick={item.action}
+                  className="flex items-center space-x-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-full bg-white/70 hover:bg-white/90 border border-purple-100 text-purple-600 hover:text-purple-700 transition-all duration-200 whitespace-nowrap text-xs"
+                >
+                  <item.icon className="w-3 h-3" />
+                  <span className="font-medium">{item.label}</span>
+                </Button>
+              ))}
+            </div>
+
+            {/* Desktop Quick Actions */}
+            <div className="hidden lg:flex items-center space-x-2 mb-3">
               {[
                 { icon: Plus, label: "Chat Baru", action: createNewChat },
                 { icon: History, label: "Riwayat", action: () => setShowSidebar(true) },
@@ -686,7 +748,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
               ))}
             </div>
 
-            <div className="flex items-end space-x-3">
+            <div className="flex items-end space-x-2 sm:space-x-3">
               <div className="flex-1">
                 <div className="relative">
                   <Textarea
@@ -695,10 +757,10 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
                     placeholder="Tanyakan apa saja kepada Mario AI..."
-                    className="w-full px-4 py-4 pr-16 border-2 border-purple-200/50 rounded-2xl focus:ring-2 focus:ring-purple-400 focus:border-purple-400 resize-none overflow-hidden mobile-input max-h-32 text-sm text-textPrimary bg-white/95 backdrop-blur-sm shadow-lg placeholder:text-gray-500 transition-all duration-200"
+                    className="w-full px-3 sm:px-4 py-3 sm:py-4 pr-12 sm:pr-16 border-2 border-purple-200/50 rounded-2xl focus:ring-2 focus:ring-purple-400 focus:border-purple-400 resize-none overflow-hidden mobile-input max-h-32 text-sm text-textPrimary bg-white/95 backdrop-blur-sm shadow-lg placeholder:text-gray-500 transition-all duration-200"
                     rows={1}
                   />
-                  <div className="absolute bottom-2 right-16 text-xs font-medium">
+                  <div className="absolute bottom-2 right-12 sm:right-16 text-xs font-medium hidden sm:block">
                     <span className={inputValue.length > 1800 ? "text-red-500" : inputValue.length > 1500 ? "text-amber-500" : "text-purple-500"}>
                       {inputValue.length}
                     </span>
@@ -720,7 +782,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
               <Button
                 onClick={handleSend}
                 disabled={!inputValue.trim() || sendMessageMutation.isPending}
-                className="gradient-primary hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-white p-4 rounded-2xl transition-all duration-200 transform hover:scale-105 active:scale-95 border-2 border-purple-300/30 mobile-input shadow-lg"
+                className="gradient-primary hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-white p-3 sm:p-4 rounded-2xl transition-all duration-200 transform hover:scale-105 active:scale-95 border-2 border-purple-300/30 mobile-input shadow-lg flex-shrink-0"
               >
                 {sendMessageMutation.isPending ? (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -730,7 +792,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
               </Button>
             </div>
             
-            <div className="mt-2 text-xs text-gray-500 text-center">
+            <div className="mt-2 text-xs text-gray-500 text-center hidden sm:block">
               Tekan <kbd className="px-1 py-0.5 bg-gray-100 rounded text-gray-600">Enter</kbd> untuk kirim, 
               <kbd className="px-1 py-0.5 bg-gray-100 rounded text-gray-600 ml-1">Shift + Enter</kbd> untuk baris baru
             </div>
