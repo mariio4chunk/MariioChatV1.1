@@ -4,20 +4,34 @@ import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Bot, User, Settings, Trash2, Sparkles, Zap } from "lucide-react";
-import type { Message } from "@shared/schema";
+import { Send, Bot, User, Settings, Trash2, Sparkles, Zap, MessageSquare, Plus, History } from "lucide-react";
+import type { Message, ChatSession } from "@shared/schema";
+import { AuthWrapper } from "@/components/AuthWrapper";
+import { AIStatusIndicator, AIThinkingVisualizer, FloatingParticles, TypingEffect } from "@/components/GimmickFeatures";
+import { User as FirebaseUser } from "firebase/auth";
 
-export default function Chat() {
+function ChatInterface({ user }: { user: FirebaseUser }) {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [currentSessionId, setCurrentSessionId] = useState<string>(() => 
+    crypto.randomUUID()
+  );
+  const [showSidebar, setShowSidebar] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Fetch messages
+  // Fetch messages for current session
   const { data: messages = [], isLoading } = useQuery<Message[]>({
-    queryKey: ["/api/messages"],
+    queryKey: ["/api/messages", currentSessionId],
+    queryFn: () => fetch(`/api/messages?sessionId=${currentSessionId}`).then(res => res.json()),
+  });
+
+  // Fetch chat sessions
+  const { data: chatSessions = [] } = useQuery<ChatSession[]>({
+    queryKey: ["/api/sessions", user.uid],
+    queryFn: () => fetch(`/api/sessions?userId=${user.uid}`).then(res => res.json()),
   });
 
   // Send message mutation
@@ -26,6 +40,8 @@ export default function Chat() {
       const response = await apiRequest("POST", "/api/messages", {
         content,
         role: "user",
+        userId: user.uid,
+        sessionId: currentSessionId,
       });
       return response.json();
     },
@@ -33,7 +49,8 @@ export default function Chat() {
       setIsTyping(true);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/messages", currentSessionId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/sessions", user.uid] });
       setInputValue("");
       setIsTyping(false);
     },
@@ -50,24 +67,37 @@ export default function Chat() {
   // Clear messages mutation
   const clearMessagesMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest("DELETE", "/api/messages");
+      const response = await apiRequest("DELETE", `/api/messages?sessionId=${currentSessionId}`);
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/messages", currentSessionId] });
       toast({
         title: "Success",
-        description: "All messages cleared",
+        description: "Riwayat percakapan telah dihapus",
       });
     },
     onError: (error) => {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to clear messages",
+        description: error instanceof Error ? error.message : "Gagal menghapus riwayat percakapan",
         variant: "destructive",
       });
     },
   });
+
+  // Create new chat session
+  const createNewChat = () => {
+    const newSessionId = crypto.randomUUID();
+    setCurrentSessionId(newSessionId);
+    setShowSidebar(false);
+  };
+
+  // Switch to existing chat session
+  const switchToSession = (sessionId: string) => {
+    setCurrentSessionId(sessionId);
+    setShowSidebar(false);
+  };
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -127,10 +157,64 @@ export default function Chat() {
 
   return (
     <div className="min-h-screen flex flex-col bg-chat">
+      {/* Sidebar for chat sessions */}
+      {showSidebar && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowSidebar(false)} />
+          <div className="absolute left-0 top-0 h-full w-80 bg-white shadow-xl">
+            <div className="p-4 border-b">
+              <div className="flex items-center justify-between">
+                <h2 className="font-semibold text-gray-800">Riwayat Chat</h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowSidebar(false)}
+                  className="p-1"
+                >
+                  ×
+                </Button>
+              </div>
+            </div>
+            <div className="p-4">
+              <Button
+                onClick={createNewChat}
+                className="w-full mb-4 gradient-primary text-white rounded-xl"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Chat Baru
+              </Button>
+              <div className="space-y-2">
+                {chatSessions.map((session) => (
+                  <Button
+                    key={session.sessionId}
+                    variant={session.sessionId === currentSessionId ? "secondary" : "ghost"}
+                    onClick={() => switchToSession(session.sessionId)}
+                    className="w-full justify-start text-left p-3 rounded-xl"
+                  >
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    <div className="truncate">
+                      {session.title || `Chat ${session.sessionId.slice(0, 8)}...`}
+                    </div>
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-header border-b border-white/20 px-3 py-3 shadow-lg sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowSidebar(true)}
+              className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl lg:hidden"
+            >
+              <History className="w-4 h-4" />
+            </Button>
             <div className="relative">
               <div className="w-8 h-8 gradient-primary rounded-xl flex items-center justify-center shadow-lg">
                 <Sparkles className="w-4 h-4 text-white" />
@@ -143,12 +227,12 @@ export default function Chat() {
               <h1 className="text-lg font-bold text-textPrimary bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 IntelliChat AI
               </h1>
-              <p className="text-xs text-gray-600 font-medium">Powered by Advanced AI • v2.1</p>
+              <p className="text-xs text-gray-600 font-medium">Powered by Gemini AI • v2.1</p>
             </div>
           </div>
           <div className="flex items-center space-x-1">
             <div className="hidden sm:flex items-center space-x-1 text-xs text-gray-500">
-              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
               <span>Online</span>
             </div>
             <Button
@@ -164,6 +248,11 @@ export default function Chat() {
               <Settings className="w-4 h-4" />
             </Button>
           </div>
+        </div>
+        
+        {/* AI Status Indicator */}
+        <div className="mt-3">
+          <AIStatusIndicator />
         </div>
       </header>
 
@@ -345,5 +434,13 @@ export default function Chat() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Chat() {
+  return (
+    <AuthWrapper>
+      {(user) => user ? <ChatInterface user={user} /> : null}
+    </AuthWrapper>
   );
 }
