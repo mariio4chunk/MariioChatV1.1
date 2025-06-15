@@ -23,7 +23,12 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
       setLoading(false);
       if (user) {
         setError(null);
+        setRetryCount(0);
       }
+    }, (error) => {
+      console.error("Auth state change error:", error);
+      setError("Terjadi kesalahan pada sistem autentikasi");
+      setLoading(false);
     });
 
     return () => unsubscribe();

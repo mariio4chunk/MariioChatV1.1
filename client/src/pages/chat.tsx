@@ -257,6 +257,16 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
   const handleSend = () => {
     const trimmedValue = inputValue.trim();
     if (!trimmedValue || sendMessageMutation.isPending) return;
+    
+    // Validasi panjang pesan
+    if (trimmedValue.length > 4000) {
+      toast({
+        title: "Pesan terlalu panjang",
+        description: "Maksimal 4000 karakter per pesan",
+        variant: "destructive",
+      });
+      return;
+    }
 
     sendMessageMutation.mutate(trimmedValue);
   };
@@ -279,14 +289,23 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
     { id: "gpt-4o-mini", name: "GPT-4o Mini", description: "Balanced Performance" }
   ];
 
-  const handleLogout = () => {
-    if (process.env.NODE_ENV === 'development') {
-      localStorage.removeItem('demoUser');
-      window.location.reload();
-    } else {
-      logout();
+  const handleLogout = async () => {
+    try {
+      setShowProfile(false);
+      if (process.env.NODE_ENV === 'development') {
+        localStorage.removeItem('demoUser');
+        window.location.reload();
+      } else {
+        await logout();
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Error",
+        description: "Gagal logout, silakan coba lagi",
+        variant: "destructive",
+      });
     }
-    setShowProfile(false);
   };
 
   if (isLoading) {
