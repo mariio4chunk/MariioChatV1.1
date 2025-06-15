@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -33,7 +34,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
   const MarkdownMessage = ({ content }: { content: string }) => {
     try {
       return (
-        <div className="prose prose-sm max-w-none text-textPrimary prose-headings:text-gray-800 prose-strong:text-gray-900 prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-white prose-blockquote:border-gray-300 prose-blockquote:bg-gray-50 prose-table:text-sm">
+        <div className="prose prose-sm max-w-none text-textPrimary prose-headings:text-gray-800 prose-strong:text-gray-900 prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-white prose-blockquote:border-blue-300 prose-blockquote:bg-blue-50 prose-table:text-sm">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
@@ -44,7 +45,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                     style={oneDark}
                     language={match[1]}
                     PreTag="div"
-                    customStyle={{ borderRadius: '0.5rem' }}
+                    customStyle={{ borderRadius: '0.75rem' }}
                     {...props}
                   >
                     {String(children).replace(/\n$/, '')}
@@ -65,7 +66,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                 );
               },
               thead({ children, ...props }) {
-                return <TableHeader className="bg-gray-50">{children}</TableHeader>;
+                return <TableHeader className="bg-blue-50">{children}</TableHeader>;
               },
               tbody({ children, ...props }) {
                 return <TableBody>{children}</TableBody>;
@@ -74,14 +75,14 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                 return <TableRow>{children}</TableRow>;
               },
               th({ children, ...props }) {
-                return <TableHead className="font-semibold text-gray-700 border-r border-gray-200 last:border-r-0">{children}</TableHead>;
+                return <TableHead className="font-semibold text-blue-700 border-r border-blue-200 last:border-r-0">{children}</TableHead>;
               },
               td({ children, ...props }) {
-                return <TableCell className="border-r border-gray-100 last:border-r-0">{children}</TableCell>;
+                return <TableCell className="border-r border-blue-100 last:border-r-0">{children}</TableCell>;
               },
               blockquote({ children, ...props }) {
                 return (
-                  <blockquote className="border-l-4 border-gray-300 bg-gray-50 pl-4 py-2 my-3 rounded-r-lg">
+                  <blockquote className="border-l-4 border-blue-500 bg-blue-50 pl-4 py-2 my-3 rounded-r-lg">
                     {children}
                   </blockquote>
                 );
@@ -254,11 +255,21 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  const handleLogout = () => {
+    if (process.env.NODE_ENV === 'development') {
+      localStorage.removeItem('demoUser');
+      window.location.reload();
+    } else {
+      logout();
+    }
+    setShowProfile(false);
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center mx-auto mb-4">
             <Bot className="w-4 h-4 text-white" />
           </div>
           <p className="text-gray-600">Loading chat...</p>
@@ -268,14 +279,14 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
   }
 
   return (
-    <div className="min-h-screen flex bg-white">
+    <div className="min-h-screen flex bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Desktop Sidebar */}
-      <div className="hidden lg:flex lg:w-64 lg:flex-col bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-2xl">
+      <div className="hidden lg:flex lg:w-64 lg:flex-col bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white shadow-2xl">
         {/* Sidebar Header */}
         <div className="p-4 border-b border-gray-700">
           <Button
             onClick={createNewChat}
-            className="w-full bg-transparent border border-gray-600 text-white hover:bg-gray-800 rounded-lg py-2.5 font-medium transition-colors duration-200"
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 rounded-xl py-2.5 font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
           >
             <Plus className="w-4 h-4 mr-2" />
             Chat Baru
@@ -283,15 +294,15 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
         </div>
 
         {/* Chat Sessions */}
-        <div className="flex-1 overflow-y-auto p-2">
+        <div className="flex-1 overflow-y-auto p-2 modern-scrollbar">
           <div className="space-y-1">
             {chatSessions.map((session) => (
               <Button
                 key={session.sessionId}
                 variant="ghost"
                 onClick={() => switchToSession(session.sessionId)}
-                className={`w-full justify-start text-left p-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors duration-200 ${
-                  session.sessionId === currentSessionId ? 'bg-gray-800' : ''
+                className={`w-full justify-start text-left p-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-all duration-200 ${
+                  session.sessionId === currentSessionId ? 'bg-gray-800 border-l-2 border-blue-500' : ''
                 }`}
               >
                 <MessageSquare className="w-4 h-4 mr-3" />
@@ -308,12 +319,12 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
           <Button
             onClick={() => setShowProfile(true)}
             variant="ghost"
-            className="w-full justify-start p-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors duration-200"
+            className="w-full justify-start p-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-all duration-200"
           >
             <UserCircle className="w-4 h-4 mr-3" />
             <div className="flex-1 text-left">
               <div className="text-sm font-medium truncate">
-                {user.displayName}
+                {user.displayName || "Demo User"}
               </div>
             </div>
           </Button>
@@ -327,7 +338,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
             className="absolute inset-0 bg-black/60 backdrop-blur-md" 
             onClick={() => setShowProfile(false)} 
           />
-          <div className="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md">
+          <div className="relative bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md animate-in zoom-in-95 duration-300">
             <button
               onClick={() => setShowProfile(false)}
               className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
@@ -336,31 +347,28 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
             </button>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <UserCircle className="w-8 h-8 text-white" />
               </div>
               <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                {user.displayName || "User"}
+                {user.displayName || "Demo User"}
               </h2>
-              <p className="text-gray-600 mb-6 text-sm">{user.email}</p>
+              <p className="text-gray-600 mb-6 text-sm">{user.email || "demo@example.com"}</p>
 
               <div className="space-y-3">
                 <Button
                   onClick={() => setShowProfile(false)}
-                  className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-lg py-3 font-medium"
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl py-3 font-medium transition-all duration-300"
                 >
-                  Close Profile
+                  Tutup Profil
                 </Button>
                 <Button
-                  onClick={() => {
-                    logout();
-                    setShowProfile(false);
-                  }}
+                  onClick={handleLogout}
                   variant="outline"
-                  className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg py-3"
+                  className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl py-3 transition-all duration-300"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
-                  Sign Out
+                  Keluar
                 </Button>
               </div>
             </div>
@@ -372,7 +380,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
       {showSidebar && (
         <div className="fixed inset-0 z-50 lg:hidden animate-in fade-in-0 duration-200">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setShowSidebar(false)} />
-          <div className="absolute left-0 top-0 h-full w-64 bg-gray-900 text-white shadow-2xl animate-in slide-in-from-left duration-300 flex flex-col">
+          <div className="absolute left-0 top-0 h-full w-64 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white shadow-2xl animate-in slide-in-from-left duration-300 flex flex-col">
             {/* Mobile Sidebar Header */}
             <div className="p-4 border-b border-gray-700">
               <div className="flex items-center justify-between mb-3">
@@ -388,7 +396,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
               </div>
               <Button
                 onClick={createNewChat}
-                className="w-full bg-transparent border border-gray-600 text-white hover:bg-gray-800 rounded-lg py-2.5 font-medium"
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 rounded-xl py-2.5 font-medium"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Chat Baru
@@ -396,15 +404,15 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
             </div>
 
             {/* Mobile Chat Sessions */}
-            <div className="flex-1 overflow-y-auto p-2">
+            <div className="flex-1 overflow-y-auto p-2 modern-scrollbar">
               <div className="space-y-1">
                 {chatSessions.map((session) => (
                   <Button
                     key={session.sessionId}
                     variant="ghost"
                     onClick={() => switchToSession(session.sessionId)}
-                    className={`w-full justify-start text-left p-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors duration-200 ${
-                      session.sessionId === currentSessionId ? 'bg-gray-800' : ''
+                    className={`w-full justify-start text-left p-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-all duration-200 ${
+                      session.sessionId === currentSessionId ? 'bg-gray-800 border-l-2 border-blue-500' : ''
                     }`}
                   >
                     <MessageSquare className="w-4 h-4 mr-3" />
@@ -424,12 +432,12 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                   setShowSidebar(false);
                 }}
                 variant="ghost"
-                className="w-full justify-start p-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors duration-200"
+                className="w-full justify-start p-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-all duration-200"
               >
                 <UserCircle className="w-4 h-4 mr-3" />
                 <div className="flex-1 text-left">
                   <div className="text-sm font-medium truncate">
-                    {user.displayName}
+                    {user.displayName || "Demo User"}
                   </div>
                 </div>
               </Button>
@@ -441,7 +449,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-white/90 backdrop-blur-lg border-b border-gray-200/50 px-4 py-3 flex items-center justify-between sticky top-0 z-10 shadow-sm">
+        <header className="bg-white/95 backdrop-blur-lg border-b border-gray-200/50 px-4 py-3 flex items-center justify-between sticky top-0 z-10 shadow-sm">
           <div className="flex items-center space-x-3">
             <Button
               variant="ghost"
@@ -451,7 +459,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
             >
               <Menu className="w-5 h-5" />
             </Button>
-            <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">Mario AI</h1>
+            <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Mario AI</h1>
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -468,11 +476,11 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
         {/* Chat Container */}
         <div className="flex-1 flex flex-col">
           {/* Messages Area or Welcome Screen */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto modern-scrollbar">
             {messages.length === 0 && !isTyping ? (
               /* Welcome Screen */
               <div className="flex flex-col items-center justify-center h-full px-4 py-8">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl flex items-center justify-center mb-8 shadow-xl animate-pulse">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-3xl flex items-center justify-center mb-8 shadow-xl animate-pulse">
                   <span className="text-white text-3xl font-bold">M</span>
                 </div>
 
@@ -484,7 +492,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8 w-full max-w-2xl">
                   <button
                     onClick={() => insertSuggestion("Buat gambar")}
-                    className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-left"
+                    className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-blue-50 hover:border-blue-300 transition-all duration-300 text-left shadow-sm hover:shadow-md"
                   >
                     <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                       <Image className="w-4 h-4 text-green-600" />
@@ -494,7 +502,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
 
                   <button
                     onClick={() => insertSuggestion("Dapatkan nasihat")}
-                    className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-left"
+                    className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-blue-50 hover:border-blue-300 transition-all duration-300 text-left shadow-sm hover:shadow-md"
                   >
                     <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                       <Lightbulb className="w-4 h-4 text-blue-600" />
@@ -504,7 +512,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
 
                   <button
                     onClick={() => insertSuggestion("Kejutkan saya")}
-                    className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-left"
+                    className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-blue-50 hover:border-blue-300 transition-all duration-300 text-left shadow-sm hover:shadow-md"
                   >
                     <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                       <Sparkles className="w-4 h-4 text-purple-600" />
@@ -514,7 +522,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
 
                   <button
                     onClick={() => insertSuggestion("Kode")}
-                    className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-left"
+                    className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-blue-50 hover:border-blue-300 transition-all duration-300 text-left shadow-sm hover:shadow-md"
                   >
                     <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
                       <FileText className="w-4 h-4 text-orange-600" />
@@ -534,7 +542,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                     }`}
                   >
                     {message.role === "assistant" && (
-                      <div className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
                         <span className="text-white text-sm font-bold">M</span>
                       </div>
                     )}
@@ -556,7 +564,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                       <div
                         className={`${
                           message.role === "user"
-                            ? "bg-gray-900 text-white rounded-2xl px-4 py-3 max-w-md"
+                            ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl px-4 py-3 max-w-md shadow-lg"
                             : "text-gray-900 w-full"
                         }`}
                       >
@@ -574,7 +582,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                     </div>
 
                     {message.role === "user" && (
-                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
                         <User className="w-4 h-4 text-white" />
                       </div>
                     )}
@@ -584,7 +592,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                 {/* AI Thinking Indicator */}
                 {isTyping && (
                   <div className="flex items-start space-x-4">
-                    <div className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-white text-sm font-bold">M</span>
                     </div>
                     <div className="flex-1">
@@ -595,9 +603,9 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                       <div className="bg-gray-100 rounded-2xl px-4 py-3 max-w-sm">
                         <div className="flex items-center space-x-2">
                           <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
+                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce delay-100"></div>
+                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce delay-200"></div>
                           </div>
                         </div>
                       </div>
@@ -611,7 +619,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
           </div>
 
           {/* Input Area */}
-          <div className="border-t border-gray-200/50 bg-white/90 backdrop-blur-lg px-4 py-4 sticky bottom-0 shadow-lg">
+          <div className="border-t border-gray-200/50 bg-white/95 backdrop-blur-lg px-4 py-4 sticky bottom-0 shadow-lg">
             <div className="max-w-4xl mx-auto">
               <div className="flex items-end space-x-3">
                 <div className="flex-1">
@@ -622,7 +630,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                       onChange={handleInputChange}
                       onKeyDown={handleKeyDown}
                       placeholder="Tanyakan apa saja"
-                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-900 focus:border-gray-900 resize-none overflow-hidden max-h-32 text-sm bg-white shadow-sm"
+                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none overflow-hidden max-h-32 text-sm bg-white shadow-sm"
                       rows={1}
                     />
 
@@ -640,7 +648,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                 <Button
                   onClick={handleSend}
                   disabled={!inputValue.trim() || sendMessageMutation.isPending}
-                  className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed text-white p-3 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white p-3 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
                   {sendMessageMutation.isPending ? (
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
