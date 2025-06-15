@@ -278,8 +278,253 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
   }
 
   return (
-    <div className="min-h-screen gradient-bg">
-      <div className="flex h-screen">{/* Chat Content */}</div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      <div className="flex h-screen">
+        {/* Sidebar */}
+        {showSidebar && (
+          <div className="fixed inset-0 z-50 lg:relative lg:inset-auto">
+            <div className="absolute inset-0 bg-black/50 lg:hidden" onClick={() => setShowSidebar(false)} />
+            <div className="relative w-80 h-full bg-white border-r border-gray-200 flex flex-col">
+              <div className="p-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-semibold text-gray-900">Chat Sessions</h2>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowSidebar(false)}
+                    className="lg:hidden"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+                <Button
+                  onClick={createNewChat}
+                  className="w-full mt-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Chat
+                </Button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4">
+                {chatSessions.map((session) => (
+                  <div
+                    key={session.sessionId}
+                    onClick={() => switchToSession(session.sessionId)}
+                    className={`p-3 rounded-lg cursor-pointer mb-2 transition-colors ${
+                      currentSessionId === session.sessionId
+                        ? "bg-blue-100 border border-blue-200"
+                        : "hover:bg-gray-100"
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <MessageSquare className="w-4 h-4 text-gray-500" />
+                      <span className="text-sm font-medium text-gray-900 truncate">
+                        {session.title}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {formatTimestamp(session.updatedAt)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Main Chat Area */}
+        <div className="flex-1 flex flex-col">
+          {/* Header */}
+          <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowSidebar(!showSidebar)}
+                >
+                  <Menu className="w-5 h-5" />
+                </Button>
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                    <Bot className="w-4 h-4 text-white" />
+                  </div>
+                  <h1 className="text-xl font-semibold text-gray-900">AI Chat</h1>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => clearMessagesMutation.mutate()}
+                  disabled={clearMessagesMutation.isPending}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowProfile(!showProfile)}
+                >
+                  <UserCircle className="w-5 h-5" />
+                </Button>
+              </div>
+            </div>
+            <AIStatusIndicator />
+          </div>
+
+          {/* Messages Area */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.length === 0 ? (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center max-w-md">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Bot className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Start a conversation
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-6">
+                    Ask me anything and I'll do my best to help you.
+                  </p>
+                  <div className="space-y-2">
+                    {[
+                      "Explain quantum computing",
+                      "Write a Python function",
+                      "Help me debug my code",
+                      "Create a website layout"
+                    ].map((suggestion) => (
+                      <Button
+                        key={suggestion}
+                        variant="outline"
+                        onClick={() => insertSuggestion(suggestion)}
+                        className="w-full justify-start text-left"
+                      >
+                        <Lightbulb className="w-4 h-4 mr-2" />
+                        {suggestion}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex space-x-3 ${
+                    message.role === "user" ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  {message.role === "assistant" && (
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Bot className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                  <div
+                    className={`max-w-3xl rounded-2xl px-4 py-3 ${
+                      message.role === "user"
+                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white"
+                        : "bg-white border border-gray-200 shadow-sm"
+                    }`}
+                  >
+                    {message.role === "user" ? (
+                      <p className="whitespace-pre-wrap">{message.content}</p>
+                    ) : (
+                      <div className="space-y-2">
+                        <MarkdownMessage content={message.content} />
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <span>{formatTimestamp(message.createdAt)}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyToClipboard(message.content)}
+                            className="h-6 px-2"
+                          >
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {message.role === "user" && (
+                    <div className="w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+
+            {isTyping && (
+              <div className="flex space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                  <Bot className="w-4 h-4 text-white" />
+                </div>
+                <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-sm">
+                  <AIThinkingVisualizer />
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input Area */}
+          <div className="border-t border-gray-200 bg-white p-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex space-x-3">
+                <div className="flex-1 relative">
+                  <Textarea
+                    ref={textareaRef}
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Type your message..."
+                    className="min-h-[48px] max-h-32 resize-none pr-12 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    disabled={sendMessageMutation.isPending}
+                  />
+                  <Button
+                    onClick={handleSend}
+                    disabled={!inputValue.trim() || sendMessageMutation.isPending}
+                    size="sm"
+                    className="absolute right-2 bottom-2 h-8 w-8 p-0 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  >
+                    <Send className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-2 text-center">
+                Press Enter to send, Shift+Enter for new line
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Profile Dropdown */}
+        {showProfile && (
+          <div className="fixed top-16 right-4 z-50 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-4">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
+                <span className="text-white font-medium">
+                  {user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}
+                </span>
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">{user.displayName || 'User'}</p>
+                <p className="text-sm text-gray-500">{user.email}</p>
+              </div>
+            </div>
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="w-full"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
+          </div>
+        )}
+      </div>
+      <FloatingParticles />
     </div>
   );
 }
