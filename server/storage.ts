@@ -1,14 +1,17 @@
-import { users, messages, type User, type InsertUser, type Message, type InsertMessage } from "@shared/schema";
+import { users, messages, chatSessions, type User, type InsertUser, type Message, type InsertMessage, type ChatSession, type InsertChatSession } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   createMessage(message: InsertMessage): Promise<Message>;
-  getMessages(): Promise<Message[]>;
-  clearMessages(): Promise<void>;
+  getMessages(sessionId?: string): Promise<Message[]>;
+  clearMessages(sessionId?: string): Promise<void>;
+  createChatSession(session: InsertChatSession): Promise<ChatSession>;
+  getChatSessions(userId?: string): Promise<ChatSession[]>;
+  updateChatSession(sessionId: string, title: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -38,15 +41,55 @@ export class DatabaseStorage implements IStorage {
     return message;
   }
 
-  async getMessages(): Promise<Message[]> {
+  async getMessages(sessionId?: string): Promise<Message[]> {
+    if (sessionId) {
+      return await db
+        .select()
+        .from(messages)
+        .where(eq(messages.sessionId, sessionId))
+        .orderBy(messages.timestamp);
+    }
     return await db
       .select()
       .from(messages)
       .orderBy(messages.timestamp);
   }
 
-  async clearMessages(): Promise<void> {
-    await db.delete(messages);
+  async clearMessages(sessionId?: string): Promise<void> {
+    if (sessionId) {
+      await db.delete(messages).where(eq(messages.sessionId, sessionId));
+    } else {
+      await db.delete(messages);
+    }
+  }
+
+  async createChatSession(session: InsertChatSession): Promise<ChatSession> {
+    const [chatSession] = await db
+      .insert(chatSessions)
+      .values(session)
+      .returning();
+    return chatSession;
+  }
+
+  async getChatSessions(userId?: string): Promise<ChatSession[]> {
+    if (userId) {
+      return await db
+        .select()
+        .from(chatSessions)
+        .where(eq(chatSessions.userId, userId))
+        .orderBy(desc(chatSessions.updatedAt));
+    }
+    return await db
+      .select()
+      .from(chatSessions)
+      .orderBy(desc(chatSessions.updatedAt));
+  }
+
+  async updateChatSession(sessionId: string, title: string): Promise<void> {
+    await db
+      .update(chatSessions)
+      .set({ title, updatedAt: new Date() })
+      .where(eq(chatSessions.sessionId, sessionId));
   }
 }
 
