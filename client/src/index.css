@@ -32,6 +32,97 @@
   --message-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
+/* Additional animations for modals and overlays */
+@keyframes fade-in-0 {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoom-in-95 {
+  from { 
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-in-from-bottom-2 {
+  from { 
+    transform: translateY(8px);
+  }
+  to { 
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-from-left {
+  from { 
+    transform: translateX(-100%);
+  }
+  to { 
+    transform: translateX(0);
+  }
+}
+
+.animate-in {
+  animation-fill-mode: both;
+}
+
+.fade-in-0 {
+  animation: fade-in-0 0.2s ease-out;
+}
+
+.zoom-in-95 {
+  animation: zoom-in-95 0.3s ease-out;
+}
+
+.slide-in-from-bottom-2 {
+  animation: slide-in-from-bottom-2 0.3s ease-out;
+}
+
+.slide-in-from-left {
+  animation: slide-in-from-left 0.3s ease-out;
+}
+
+/* Improve scrollbar styling */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Safe area for mobile */
+.mobile-safe-area {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Better mobile input styling */
+.mobile-input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Improve focus states */
+*:focus-visible {
+  outline: 2px solid hsl(262, 90%, 50%);
+  outline-offset: 2px;
+}
+
+/* Glass morphism effect */
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+}
+
 .dark {
   --background: hsl(224, 71%, 4%);
   --foreground: hsl(210, 40%, 98%);

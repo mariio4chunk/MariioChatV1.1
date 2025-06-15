@@ -29,12 +29,14 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Markdown rendering component
-  const MarkdownMessage = ({ content }: { content: string }) => (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      className="prose prose-sm max-w-none text-textPrimary prose-headings:text-purple-700 prose-strong:text-purple-600 prose-code:text-pink-600 prose-code:bg-purple-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-white prose-blockquote:border-purple-300 prose-blockquote:bg-purple-50 prose-table:text-sm"
-      components={{
+  // Markdown rendering component with error handling
+  const MarkdownMessage = ({ content }: { content: string }) => {
+    try {
+      return (
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          className="prose prose-sm max-w-none text-textPrimary prose-headings:text-purple-700 prose-strong:text-purple-600 prose-code:text-pink-600 prose-code:bg-purple-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-white prose-blockquote:border-purple-300 prose-blockquote:bg-purple-50 prose-table:text-sm"
+          components={{
         code({ node, inline, className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || '');
           return !inline && match ? (
@@ -88,14 +90,47 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
     >
       {content}
     </ReactMarkdown>
-  );
+      );
+    } catch (error) {
+      console.error('Error rendering markdown:', error);
+      return (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-600 text-sm">Error rendering message content</p>
+          <pre className="text-xs text-gray-600 mt-2 whitespace-pre-wrap">{content}</pre>
+        </div>
+      );
+    }
+  };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Copied!",
-      description: "Message copied to clipboard",
-    });
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({
+        title: "Berhasil!",
+        description: "Pesan berhasil disalin ke clipboard",
+      });
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        toast({
+          title: "Berhasil!",
+          description: "Pesan berhasil disalin ke clipboard",
+        });
+      } catch (fallbackError) {
+        toast({
+          title: "Error",
+          description: "Gagal menyalin pesan ke clipboard",
+          variant: "destructive",
+        });
+      }
+      document.body.removeChild(textArea);
+    }
   };
 
   // Fetch messages for current session
@@ -313,55 +348,84 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
 
       {/* Profile Modal */}
       {showProfile && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowProfile(false)} />
-          <div className="relative bg-white rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in-0 duration-200">
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-md" 
+            onClick={() => setShowProfile(false)} 
+          />
+          <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-6 sm:p-8 w-full max-w-md max-h-[90vh] overflow-y-auto animate-in zoom-in-95 slide-in-from-bottom-2 duration-300">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowProfile(false)}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+            >
+              <span className="text-gray-400 hover:text-gray-600 text-xl">×</span>
+            </button>
+            
             <div className="text-center">
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden shadow-lg">
-                <img
-                  src={user.photoURL || ""}
-                  alt={user.displayName || "User"}
-                  className="w-full h-full object-cover"
-                />
+              {/* Avatar Section */}
+              <div className="relative w-24 h-24 mx-auto mb-6">
+                <div className="w-full h-full rounded-full overflow-hidden shadow-xl ring-4 ring-white/50">
+                  {user.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt={user.displayName || "User"}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                      }}
+                    />
+                  ) : null}
+                  <div className={`w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center ${user.photoURL ? 'hidden' : ''}`}>
+                    <UserCircle className="w-12 h-12 text-white" />
+                  </div>
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-400 rounded-full border-3 border-white flex items-center justify-center">
+                  <div className="w-3 h-3 bg-white rounded-full"></div>
+                </div>
               </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                {user.displayName}
+
+              {/* User Info */}
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                {user.displayName || "User"}
               </h2>
-              <p className="text-gray-600 mb-6">{user.email}</p>
+              <p className="text-gray-600 mb-6 text-sm break-all">{user.email}</p>
               
-              <div className="space-y-3">
-                <div className="bg-purple-50 rounded-xl p-4 text-left">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <MessageSquare className="w-4 h-4 text-purple-600" />
-                    <span className="text-sm font-medium text-purple-700">Chat Sessions</span>
+              {/* Stats Cards */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-4 border border-purple-200/50">
+                  <div className="flex items-center justify-center mb-2">
+                    <MessageSquare className="w-5 h-5 text-purple-600" />
                   </div>
                   <p className="text-2xl font-bold text-purple-600">{chatSessions.length}</p>
+                  <p className="text-xs text-purple-700 font-medium">Chat Sessions</p>
                 </div>
                 
-                <div className="bg-blue-50 rounded-xl p-4 text-left">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Sparkles className="w-4 h-4 text-blue-600" />
-                    <span className="text-sm font-medium text-blue-700">AI Model</span>
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-4 border border-blue-200/50">
+                  <div className="flex items-center justify-center mb-2">
+                    <Sparkles className="w-5 h-5 text-blue-600" />
                   </div>
-                  <p className="text-sm text-blue-600 font-medium">Gemini AI Enhanced</p>
+                  <p className="text-sm font-bold text-blue-600">Gemini</p>
+                  <p className="text-xs text-blue-700 font-medium">AI Enhanced</p>
                 </div>
               </div>
               
-              <div className="flex space-x-3 mt-6">
+              {/* Action Buttons */}
+              <div className="space-y-3">
                 <Button
                   onClick={() => setShowProfile(false)}
-                  variant="outline"
-                  className="flex-1"
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl py-3 font-medium transition-all duration-200 transform hover:scale-105"
                 >
-                  Close
+                  Close Profile
                 </Button>
                 <Button
                   onClick={() => {
                     logout();
                     setShowProfile(false);
                   }}
-                  variant="destructive"
-                  className="flex-1"
+                  variant="outline"
+                  className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-xl py-3 transition-all duration-200"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
                   Sign Out
@@ -374,9 +438,9 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
 
       {/* Mobile Sidebar */}
       {showSidebar && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowSidebar(false)} />
-          <div className="absolute left-0 top-0 h-full w-80 max-w-[85vw] bg-white shadow-xl">
+        <div className="fixed inset-0 z-50 lg:hidden animate-in fade-in-0 duration-200">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setShowSidebar(false)} />
+          <div className="absolute left-0 top-0 h-full w-80 max-w-[85vw] bg-white/95 backdrop-blur-xl shadow-2xl border-r border-white/20 animate-in slide-in-from-left duration-300"></div>
             {/* Sidebar Header */}
             <div className="p-4 border-b border-purple-100 bg-gradient-to-r from-purple-50 to-pink-50">
               <div className="flex items-center justify-between mb-3">
