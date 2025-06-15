@@ -3,36 +3,36 @@
 @tailwind utilities;
 
 :root {
-  --background: linear-gradient(135deg, hsl(220, 30%, 97%) 0%, hsl(240, 25%, 95%) 100%);
-  --foreground: hsl(220, 15%, 20%);
-  --muted: hsl(210, 40%, 96%);
-  --muted-foreground: hsl(215, 16%, 47%);
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(0, 0%, 9%);
+  --muted: hsl(0, 0%, 96%);
+  --muted-foreground: hsl(0, 0%, 45%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(224, 71%, 4%);
+  --popover-foreground: hsl(0, 0%, 9%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(224, 71%, 4%);
-  --border: hsl(214, 32%, 91%);
-  --input: hsl(214, 32%, 91%);
-  --primary: linear-gradient(135deg, hsl(262, 90%, 50%) 0%, hsl(292, 84%, 61%) 100%);
-  --primary-foreground: hsl(210, 40%, 98%);
-  --secondary: hsl(260, 15%, 10%);
-  --secondary-foreground: hsl(220, 9%, 46%);
-  --accent: hsl(220, 14%, 96%);
-  --accent-foreground: hsl(220, 9%, 46%);
+  --card-foreground: hsl(0, 0%, 9%);
+  --border: hsl(0, 0%, 90%);
+  --input: hsl(0, 0%, 90%);
+  --primary: hsl(0, 0%, 9%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(0, 0%, 96%);
+  --secondary-foreground: hsl(0, 0%, 9%);
+  --accent: hsl(0, 0%, 96%);
+  --accent-foreground: hsl(0, 0%, 9%);
   --destructive: hsl(0, 84%, 60%);
-  --destructive-foreground: hsl(210, 40%, 98%);
-  --ring: hsl(262, 90%, 50%);
-  --radius: 1rem;
-  
-  /* Custom colors matching design requirements */
-  --textPrimary: hsl(220, 15%, 20%);
-  --aiResponse: linear-gradient(135deg, hsl(240, 30%, 97%) 0%, hsl(260, 25%, 95%) 100%);
-  --chat-bg: linear-gradient(135deg, hsl(220, 30%, 97%) 0%, hsl(240, 25%, 95%) 100%);
-  --header-bg: rgba(255, 255, 255, 0.8);
-  --message-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(0, 0%, 9%);
+  --radius: 0.5rem;
+
+  /* Custom colors for clean interface */
+  --textPrimary: hsl(0, 0%, 9%);
+  --aiResponse: hsl(0, 0%, 100%);
+  --chat-bg: hsl(0, 0%, 100%);
+  --header-bg: hsl(0, 0%, 100%);
+  --message-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Additional animations for modals and overlays */
+/* Animation keyframes */
 @keyframes fade-in-0 {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -87,7 +87,7 @@
   animation: slide-in-from-left 0.3s ease-out;
 }
 
-/* Improve scrollbar styling */
+/* Scrollbar styling */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -111,42 +111,34 @@
 
 /* Improve focus states */
 *:focus-visible {
-  outline: 2px solid hsl(262, 90%, 50%);
+  outline: 2px solid hsl(0, 0%, 9%);
   outline-offset: 2px;
 }
 
-/* Glass morphism effect */
-.glass-morphism {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-}
-
 .dark {
-  --background: hsl(224, 71%, 4%);
-  --foreground: hsl(210, 40%, 98%);
-  --muted: hsl(223, 47%, 11%);
-  --muted-foreground: hsl(215, 16%, 57%);
-  --popover: hsl(224, 71%, 4%);
-  --popover-foreground: hsl(210, 40%, 98%);
-  --card: hsl(224, 71%, 4%);
-  --card-foreground: hsl(210, 40%, 98%);
-  --border: hsl(216, 34%, 17%);
-  --input: hsl(216, 34%, 17%);
-  --primary: hsl(239, 84%, 67%);
-  --primary-foreground: hsl(210, 40%, 98%);
-  --secondary: hsl(216, 34%, 17%);
-  --secondary-foreground: hsl(210, 40%, 98%);
-  --accent: hsl(216, 34%, 17%);
-  --accent-foreground: hsl(210, 40%, 98%);
+  --background: hsl(0, 0%, 9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(0, 0%, 15%);
+  --muted-foreground: hsl(0, 0%, 63%);
+  --popover: hsl(0, 0%, 9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(0, 0%, 9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(0, 0%, 15%);
+  --input: hsl(0, 0%, 15%);
+  --primary: hsl(0, 0%, 98%);
+  --primary-foreground: hsl(0, 0%, 9%);
+  --secondary: hsl(0, 0%, 15%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(0, 0%, 15%);
+  --accent-foreground: hsl(0, 0%, 98%);
   --destructive: hsl(0, 63%, 31%);
-  --destructive-foreground: hsl(210, 40%, 98%);
-  --ring: hsl(216, 34%, 17%);
-  --radius: 0.5rem;
-  
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(0, 0%, 15%);
+
   /* Custom colors for dark mode */
-  --textPrimary: hsl(210, 40%, 98%);
-  --aiResponse: hsl(216, 34%, 17%);
+  --textPrimary: hsl(0, 0%, 98%);
+  --aiResponse: hsl(0, 0%, 9%);
 }
 
 @layer base {
@@ -160,7 +152,7 @@
   }
 }
 
-/* Custom utility classes for the chat interface */
+/* Custom utility classes */
 .bg-textPrimary {
   background-color: var(--textPrimary);
 }
@@ -179,46 +171,23 @@
 
 .bg-header {
   background: var(--header-bg);
-  backdrop-filter: blur(10px);
 }
 
 .message-shadow {
   box-shadow: var(--message-shadow);
 }
 
-.gradient-primary {
-  background: var(--primary);
-}
-
-/* Scrollbar utilities */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* Mobile input improvements */
-.mobile-input {
-  -webkit-appearance: none;
-  -webkit-border-radius: 0;
-}
-
-.mobile-safe-area {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* Enhanced markdown styling */
+/* Enhanced markdown styling for clean interface */
 .prose {
   max-width: none;
+  color: hsl(0, 0%, 9%);
 }
 
 .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
   margin-top: 1.5em;
   margin-bottom: 0.5em;
   font-weight: 600;
+  color: hsl(0, 0%, 9%);
 }
 
 .prose h1 { font-size: 1.5em; }
@@ -240,24 +209,24 @@
 }
 
 .prose blockquote {
-  border-left: 4px solid #a855f7;
-  background: #faf5ff;
+  border-left: 4px solid hsl(0, 0%, 80%);
+  background: hsl(0, 0%, 98%);
   padding: 1em;
   margin: 1em 0;
   border-radius: 0 0.5rem 0.5rem 0;
 }
 
 .prose code:not(pre code) {
-  background: #f3e8ff;
-  color: #7c3aed;
+  background: hsl(0, 0%, 95%);
+  color: hsl(0, 0%, 20%);
   padding: 0.2em 0.4em;
   border-radius: 0.25rem;
   font-size: 0.875em;
 }
 
 .prose pre {
-  background: #1f2937;
-  color: #f9fafb;
+  background: hsl(0, 0%, 9%);
+  color: hsl(0, 0%, 98%);
   padding: 1em;
   border-radius: 0.5rem;
   overflow-x: auto;
@@ -274,37 +243,31 @@
 .prose th, .prose td {
   padding: 0.75em;
   text-align: left;
-  border: 1px solid #e5e7eb;
+  border: 1px solid hsl(0, 0%, 90%);
 }
 
 .prose th {
-  background: #f9fafb;
+  background: hsl(0, 0%, 96%);
   font-weight: 600;
 }
 
 .prose strong {
   font-weight: 600;
-  color: #7c3aed;
+  color: hsl(0, 0%, 9%);
 }
 
 .prose em {
   font-style: italic;
-  color: #059669;
+  color: hsl(0, 0%, 30%);
 }
 
 .prose a {
-  color: #2563eb;
+  color: hsl(220, 100%, 50%);
   text-decoration: underline;
 }
 
 .prose a:hover {
-  color: #1d4ed8;
-}
-
-.glassmorphism {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: hsl(220, 100%, 40%);
 }
 
 /* Mobile optimizations */
@@ -312,9 +275,9 @@
   .mobile-safe-area {
     padding-bottom: max(env(safe-area-inset-bottom), 16px);
   }
-  
+
   .mobile-input {
-    min-height: 44px; /* iOS minimum touch target */
+    min-height: 44px;
   }
 
   /* Prevent zoom on input focus in iOS */
@@ -357,77 +320,12 @@
   display: none;
 }
 
-/* Improved mobile viewport handling */
-@media (max-width: 768px) {
-  /* Prevent content from being too wide */
-  .max-w-6xl {
-    max-width: 100%;
-  }
-
-  /* Better mobile spacing */
-  .space-x-4 > * + * {
-    margin-left: 0.5rem;
-  }
-
-  /* Mobile-friendly message bubbles */
-  .message-shadow {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-}
-
-/* Animation delays for typing indicator */
-.delay-200 {
-  animation-delay: 0.2s;
-}
-
-.delay-500 {
-  animation-delay: 0.5s;
-}
-
-/* Custom animations */
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: -200px 0; }
-  100% { background-position: calc(200px + 100%) 0; }
-}
-
-.animate-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-  background-size: 200px 100%;
-  animation: shimmer 2s infinite;
-}
-
-@keyframes floatRotate {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  33% { transform: translateY(-10px) rotate(120deg); }
-  66% { transform: translateY(5px) rotate(240deg); }
-}
-
-.animate-float-rotate {
-  animation: floatRotate 3s ease-in-out infinite;
-}
-
 /* Touch optimization */
 .touch-manipulation {
   touch-action: manipulation;
 }
 
-/* Mobile-safe area adjustments */
-@media (max-width: 640px) {
-  .mobile-safe-area {
-    padding-bottom: max(env(safe-area-inset-bottom), 16px);
-  }
-}
-
-/* Smooth scrolling for better UX */
+/* Smooth scrolling */
 html {
   scroll-behavior: smooth;
 }
@@ -436,7 +334,7 @@ html {
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid #7c3aed;
+  outline: 2px solid hsl(0, 0%, 9%);
   outline-offset: 2px;
 }
 
@@ -447,13 +345,11 @@ button {
   user-select: none;
 }
 
-/* Improve mobile readability */
-@media (max-width: 640px) {
-  .text-xs {
-    font-size: 0.75rem;
-  }
-  
-  .text-sm {
-    font-size: 0.875rem;
-  }
+/* Animation delays for typing indicator */
+.delay-100 {
+  animation-delay: 0.1s;
+}
+
+.delay-200 {
+  animation-delay: 0.2s;
 }

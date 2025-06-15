@@ -4,7 +4,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Bot, User, Settings, Trash2, Sparkles, Zap, MessageSquare, Plus, History, Menu, LogOut, Crown, UserCircle, FileText, Download, Copy } from "lucide-react";
+import { Send, Bot, User, Settings, Trash2, Sparkles, Zap, MessageSquare, Plus, History, Menu, LogOut, Crown, UserCircle, FileText, Download, Copy, Image, Globe, Clock, Lightbulb, Folder, Mic } from "lucide-react";
 import type { Message, ChatSession } from "@shared/schema";
 import { AuthWrapper } from "@/components/AuthWrapper";
 import { AIStatusIndicator, AIThinkingVisualizer, FloatingParticles, TypingEffect } from "@/components/GimmickFeatures";
@@ -35,7 +35,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
       return (
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
-          className="prose prose-sm max-w-none text-textPrimary prose-headings:text-purple-700 prose-strong:text-purple-600 prose-code:text-pink-600 prose-code:bg-purple-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-white prose-blockquote:border-purple-300 prose-blockquote:bg-purple-50 prose-table:text-sm"
+          className="prose prose-sm max-w-none text-textPrimary prose-headings:text-gray-800 prose-strong:text-gray-900 prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-white prose-blockquote:border-gray-300 prose-blockquote:bg-gray-50 prose-table:text-sm"
           components={{
         code({ node, inline, className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || '');
@@ -58,14 +58,14 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
         table({ children }) {
           return (
             <div className="my-4 overflow-x-auto">
-              <Table className="border border-purple-200 rounded-lg">
+              <Table className="border border-gray-200 rounded-lg">
                 {children}
               </Table>
             </div>
           );
         },
         thead({ children }) {
-          return <TableHeader className="bg-purple-50">{children}</TableHeader>;
+          return <TableHeader className="bg-gray-50">{children}</TableHeader>;
         },
         tbody({ children }) {
           return <TableBody>{children}</TableBody>;
@@ -74,14 +74,14 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
           return <TableRow>{children}</TableRow>;
         },
         th({ children }) {
-          return <TableHead className="font-semibold text-purple-700 border-r border-purple-200 last:border-r-0">{children}</TableHead>;
+          return <TableHead className="font-semibold text-gray-700 border-r border-gray-200 last:border-r-0">{children}</TableHead>;
         },
         td({ children }) {
-          return <TableCell className="border-r border-purple-100 last:border-r-0">{children}</TableCell>;
+          return <TableCell className="border-r border-gray-100 last:border-r-0">{children}</TableCell>;
         },
         blockquote({ children }) {
           return (
-            <blockquote className="border-l-4 border-purple-300 bg-purple-50 pl-4 py-2 my-3 rounded-r-lg">
+            <blockquote className="border-l-4 border-gray-300 bg-gray-50 pl-4 py-2 my-3 rounded-r-lg">
               {children}
             </blockquote>
           );
@@ -238,7 +238,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
   const handleSend = () => {
     const trimmedValue = inputValue.trim();
     if (!trimmedValue || sendMessageMutation.isPending) return;
-    
+
     sendMessageMutation.mutate(trimmedValue);
   };
 
@@ -255,38 +255,26 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mx-auto mb-4">
+          <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center mx-auto mb-4">
             <Bot className="w-4 h-4 text-white" />
           </div>
-          <p className="text-muted-foreground">Loading chat...</p>
+          <p className="text-gray-600">Loading chat...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex bg-chat">
+    <div className="min-h-screen flex bg-white">
       {/* Desktop Sidebar */}
-      <div className="hidden lg:flex lg:w-80 lg:flex-col bg-white/95 backdrop-blur-sm border-r border-purple-100 shadow-lg">
+      <div className="hidden lg:flex lg:w-64 lg:flex-col bg-gray-900 text-white">
         {/* Sidebar Header */}
-        <div className="p-6 border-b border-purple-100">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center shadow-lg">
-              <Crown className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Mario AI
-              </h1>
-              <p className="text-xs text-gray-500">Asisten AI Cerdas</p>
-            </div>
-          </div>
-          
+        <div className="p-4 border-b border-gray-700">
           <Button
             onClick={createNewChat}
-            className="w-full gradient-primary text-white rounded-xl py-2.5 font-medium hover:shadow-lg transition-all duration-200"
+            className="w-full bg-transparent border border-gray-600 text-white hover:bg-gray-800 rounded-lg py-2.5 font-medium transition-colors duration-200"
           >
             <Plus className="w-4 h-4 mr-2" />
             Chat Baru
@@ -294,55 +282,40 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
         </div>
 
         {/* Chat Sessions */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-2">
           <div className="space-y-1">
             {chatSessions.map((session) => (
               <Button
                 key={session.sessionId}
-                variant={session.sessionId === currentSessionId ? "secondary" : "ghost"}
+                variant="ghost"
                 onClick={() => switchToSession(session.sessionId)}
-                className="w-full justify-start text-left p-3 rounded-xl hover:bg-purple-50 transition-colors duration-200"
+                className={`w-full justify-start text-left p-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors duration-200 ${
+                  session.sessionId === currentSessionId ? 'bg-gray-800' : ''
+                }`}
               >
-                <MessageSquare className="w-4 h-4 mr-3 text-purple-600" />
+                <MessageSquare className="w-4 h-4 mr-3" />
                 <div className="truncate text-sm">
                   {session.title || `Chat ${session.sessionId.slice(0, 8)}...`}
                 </div>
               </Button>
             ))}
-            {chatSessions.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                <MessageSquare className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                <p className="text-sm">Belum ada riwayat chat</p>
-              </div>
-            )}
           </div>
         </div>
 
         {/* Sidebar Footer */}
-        <div className="p-4 border-t border-purple-100">
-          <div className="space-y-2">
-            <Button
-              onClick={() => setShowProfile(true)}
-              variant="ghost"
-              className="w-full justify-start p-3 rounded-xl hover:bg-purple-50 transition-colors duration-200"
-            >
-              <UserCircle className="w-4 h-4 mr-3 text-purple-600" />
-              <div className="flex-1 text-left">
-                <div className="text-sm font-medium text-gray-700 truncate">
-                  {user.displayName}
-                </div>
-                <div className="text-xs text-gray-500">View Profile</div>
+        <div className="p-4 border-t border-gray-700">
+          <Button
+            onClick={() => setShowProfile(true)}
+            variant="ghost"
+            className="w-full justify-start p-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors duration-200"
+          >
+            <UserCircle className="w-4 h-4 mr-3" />
+            <div className="flex-1 text-left">
+              <div className="text-sm font-medium truncate">
+                {user.displayName}
               </div>
-            </Button>
-            <Button
-              onClick={() => logout()}
-              variant="ghost"
-              className="w-full justify-start p-3 rounded-xl hover:bg-red-50 text-red-600 transition-colors duration-200"
-            >
-              <LogOut className="w-4 h-4 mr-3" />
-              <span className="text-sm">Sign Out</span>
-            </Button>
-          </div>
+            </div>
+          </Button>
         </div>
       </div>
 
@@ -353,69 +326,27 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
             className="absolute inset-0 bg-black/60 backdrop-blur-md" 
             onClick={() => setShowProfile(false)} 
           />
-          <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-6 sm:p-8 w-full max-w-md max-h-[90vh] overflow-y-auto animate-in zoom-in-95 slide-in-from-bottom-2 duration-300">
-            {/* Close Button */}
+          <div className="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md">
             <button
               onClick={() => setShowProfile(false)}
               className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
             >
               <span className="text-gray-400 hover:text-gray-600 text-xl">×</span>
             </button>
-            
-            <div className="text-center">
-              {/* Avatar Section */}
-              <div className="relative w-24 h-24 mx-auto mb-6">
-                <div className="w-full h-full rounded-full overflow-hidden shadow-xl ring-4 ring-white/50">
-                  {user.photoURL ? (
-                    <img
-                      src={user.photoURL}
-                      alt={user.displayName || "User"}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                      }}
-                    />
-                  ) : null}
-                  <div className={`w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center ${user.photoURL ? 'hidden' : ''}`}>
-                    <UserCircle className="w-12 h-12 text-white" />
-                  </div>
-                </div>
-                <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-400 rounded-full border-3 border-white flex items-center justify-center">
-                  <div className="w-3 h-3 bg-white rounded-full"></div>
-                </div>
-              </div>
 
-              {/* User Info */}
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                <UserCircle className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">
                 {user.displayName || "User"}
               </h2>
-              <p className="text-gray-600 mb-6 text-sm break-all">{user.email}</p>
-              
-              {/* Stats Cards */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-4 border border-purple-200/50">
-                  <div className="flex items-center justify-center mb-2">
-                    <MessageSquare className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <p className="text-2xl font-bold text-purple-600">{chatSessions.length}</p>
-                  <p className="text-xs text-purple-700 font-medium">Chat Sessions</p>
-                </div>
-                
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-4 border border-blue-200/50">
-                  <div className="flex items-center justify-center mb-2">
-                    <Sparkles className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <p className="text-sm font-bold text-blue-600">Gemini</p>
-                  <p className="text-xs text-blue-700 font-medium">AI Enhanced</p>
-                </div>
-              </div>
-              
-              {/* Action Buttons */}
+              <p className="text-gray-600 mb-6 text-sm">{user.email}</p>
+
               <div className="space-y-3">
                 <Button
                   onClick={() => setShowProfile(false)}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl py-3 font-medium transition-all duration-200 transform hover:scale-105"
+                  className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-lg py-3 font-medium"
                 >
                   Close Profile
                 </Button>
@@ -425,7 +356,7 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
                     setShowProfile(false);
                   }}
                   variant="outline"
-                  className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-xl py-3 transition-all duration-200"
+                  className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg py-3"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
                   Sign Out
@@ -440,87 +371,67 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
       {showSidebar && (
         <div className="fixed inset-0 z-50 lg:hidden animate-in fade-in-0 duration-200">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setShowSidebar(false)} />
-          <div className="absolute left-0 top-0 h-full w-80 max-w-[85vw] bg-white/95 backdrop-blur-xl shadow-2xl border-r border-white/20 animate-in slide-in-from-left duration-300 flex flex-col">
-            {/* Sidebar Header */}
-            <div className="p-4 border-b border-purple-100 bg-gradient-to-r from-purple-50 to-pink-50">
+          <div className="absolute left-0 top-0 h-full w-64 bg-gray-900 text-white shadow-2xl animate-in slide-in-from-left duration-300 flex flex-col">
+            {/* Mobile Sidebar Header */}
+            <div className="p-4 border-b border-gray-700">
               <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 gradient-primary rounded-xl flex items-center justify-center">
-                    <Crown className="w-4 h-4 text-white" />
-                  </div>
-                  <h2 className="font-bold text-gray-800 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Mario AI</h2>
-                </div>
+                <h2 className="font-semibold text-white">Mario AI</h2>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowSidebar(false)}
-                  className="p-2 hover:bg-purple-100 rounded-xl"
+                  className="p-2 hover:bg-gray-800 rounded-lg text-gray-300"
                 >
-                  <span className="text-xl text-gray-600">×</span>
+                  <span className="text-xl">×</span>
                 </Button>
               </div>
               <Button
                 onClick={createNewChat}
-                className="w-full gradient-primary text-white rounded-xl py-2.5 font-medium"
+                className="w-full bg-transparent border border-gray-600 text-white hover:bg-gray-800 rounded-lg py-2.5 font-medium"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Chat Baru
               </Button>
             </div>
 
-            {/* Chat Sessions */}
-            <div className="flex-1 overflow-y-auto p-4">
+            {/* Mobile Chat Sessions */}
+            <div className="flex-1 overflow-y-auto p-2">
               <div className="space-y-1">
                 {chatSessions.map((session) => (
                   <Button
                     key={session.sessionId}
-                    variant={session.sessionId === currentSessionId ? "secondary" : "ghost"}
+                    variant="ghost"
                     onClick={() => switchToSession(session.sessionId)}
-                    className="w-full justify-start text-left p-3 rounded-xl hover:bg-purple-50 transition-colors duration-200"
+                    className={`w-full justify-start text-left p-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors duration-200 ${
+                      session.sessionId === currentSessionId ? 'bg-gray-800' : ''
+                    }`}
                   >
-                    <MessageSquare className="w-4 h-4 mr-3 text-purple-600" />
+                    <MessageSquare className="w-4 h-4 mr-3" />
                     <div className="truncate text-sm">
                       {session.title || `Chat ${session.sessionId.slice(0, 8)}...`}
                     </div>
                   </Button>
                 ))}
-                {chatSessions.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
-                    <MessageSquare className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                    <p className="text-sm">Belum ada riwayat chat</p>
-                  </div>
-                )}
               </div>
             </div>
 
             {/* Mobile Sidebar Footer */}
-            <div className="p-4 border-t border-purple-100 bg-gray-50">
-              <div className="space-y-2">
-                <Button
-                  onClick={() => {
-                    setShowProfile(true);
-                    setShowSidebar(false);
-                  }}
-                  variant="ghost"
-                  className="w-full justify-start p-3 rounded-xl hover:bg-purple-50 transition-colors duration-200"
-                >
-                  <UserCircle className="w-4 h-4 mr-3 text-purple-600" />
-                  <div className="flex-1 text-left">
-                    <div className="text-sm font-medium text-gray-700 truncate">
-                      {user.displayName}
-                    </div>
-                    <div className="text-xs text-gray-500">View Profile</div>
+            <div className="p-4 border-t border-gray-700">
+              <Button
+                onClick={() => {
+                  setShowProfile(true);
+                  setShowSidebar(false);
+                }}
+                variant="ghost"
+                className="w-full justify-start p-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors duration-200"
+              >
+                <UserCircle className="w-4 h-4 mr-3" />
+                <div className="flex-1 text-left">
+                  <div className="text-sm font-medium truncate">
+                    {user.displayName}
                   </div>
-                </Button>
-                <Button
-                  onClick={() => logout()}
-                  variant="ghost"
-                  className="w-full justify-start p-3 rounded-xl hover:bg-red-50 text-red-600 transition-colors duration-200"
-                >
-                  <LogOut className="w-4 h-4 mr-3" />
-                  <span className="text-sm">Sign Out</span>
-                </Button>
-              </div>
+                </div>
+              </Button>
             </div>
           </div>
         </div>
@@ -529,362 +440,216 @@ function ChatInterface({ user }: { user: FirebaseUser }) {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-      <header className="bg-header border-b border-white/20 px-3 sm:px-4 py-3 sm:py-4 shadow-lg sticky top-0 z-10">
-        <div className="flex items-center justify-between max-w-6xl mx-auto w-full">
-          <div className="flex items-center space-x-2 sm:space-x-4 flex-1 min-w-0">
+        <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+          <div className="flex items-center space-x-3">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowSidebar(true)}
-              className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl lg:hidden flex-shrink-0"
+              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg lg:hidden"
             >
-              <Menu className="w-4 h-4" />
+              <Menu className="w-5 h-5" />
             </Button>
-            <div className="relative flex-shrink-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 gradient-primary rounded-2xl flex items-center justify-center shadow-lg">
-                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-              </div>
-              <div className="absolute -top-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 bg-green-400 rounded-full border-2 border-white flex items-center justify-center">
-                <Zap className="w-1.5 h-1.5 sm:w-2 sm:h-2 text-white" />
-              </div>
-            </div>
-            <div className="min-w-0 flex-1">
-              <h1 className="text-lg sm:text-xl font-bold text-textPrimary bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent truncate">
-                Mario AI
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-600 font-medium hidden sm:block">Powered by Gemini AI • Enhanced Edition</p>
-              <p className="text-xs text-gray-600 font-medium sm:hidden">AI Enhanced</p>
-            </div>
+            <h1 className="text-xl font-semibold text-gray-900">Mario AI</h1>
           </div>
-          <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
-            <div className="hidden sm:flex items-center space-x-2 bg-green-50 px-2 sm:px-3 py-1 rounded-full">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-xs font-medium text-green-700">Online</span>
-            </div>
+          <div className="flex items-center space-x-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowProfile(true)}
-              className="p-1.5 sm:p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-200"
+              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
             >
-              <UserCircle className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => clearMessagesMutation.mutate()}
-              disabled={clearMessagesMutation.isPending}
-              className="p-1.5 sm:p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-200 hidden sm:flex"
-            >
-              <Trash2 className="w-4 h-4" />
+              <UserCircle className="w-5 h-5" />
             </Button>
           </div>
-        </div>
-        
-        
-      </header>
+        </header>
 
-      {/* Chat Container */}
-      <div className="flex-1 flex flex-col w-full">
-        {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 max-w-6xl mx-auto w-full">
-          {messages.length === 0 && (
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 gradient-primary rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
-                <Sparkles className="w-4 h-4 text-white" />
-              </div>
-              <div className="flex-1">
-                <div className="bg-aiResponse rounded-2xl rounded-tl-md px-4 py-3 message-shadow border border-white/30">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <Crown className="w-3 h-3 text-yellow-500" />
-                    <span className="text-xs font-semibold text-purple-600">Mario AI</span>
-                  </div>
-                  <p className="text-textPrimary text-sm leading-relaxed">
-                    Ciao! Saya <span className="font-semibold text-purple-600">Mario AI</span>, asisten AI yang siap membantu Anda! 
-                    Saya dapat menjawab pertanyaan, menganalisis data, menulis konten kreatif, dan berdiskusi tentang berbagai topik. 
-                    Apa yang bisa saya bantu hari ini?
-                  </p>
+        {/* Chat Container */}
+        <div className="flex-1 flex flex-col">
+          {/* Messages Area or Welcome Screen */}
+          <div className="flex-1 overflow-y-auto">
+            {messages.length === 0 && !isTyping ? (
+              /* Welcome Screen */
+              <div className="flex flex-col items-center justify-center h-full px-4 py-8">
+                <div className="w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center mb-6">
+                  <span className="text-white text-2xl font-bold">M</span>
                 </div>
-                <div className="mt-1 text-xs text-gray-500 px-4 flex items-center space-x-2">
-                  <span>Baru saja</span>
-                  <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-                  <span className="text-purple-500 font-medium">AI Ready</span>
-                </div>
-              </div>
-            </div>
-          )}
 
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex items-start space-x-4 ${
-                message.role === "user" ? "justify-end" : ""
-              }`}
-            >
-              {message.role === "assistant" && (
-                <div className="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                  <Sparkles className="w-5 h-5 text-white" />
-                </div>
-              )}
-              
-              <div className={`flex-1 ${message.role === "user" ? "flex flex-col items-end" : ""} max-w-4xl`}>
-                {message.role === "assistant" && (
-                  <div className="flex items-center justify-between w-full mb-2 px-4">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="text-sm font-semibold text-purple-600">Mario AI</span>
-                      <span className="text-xs text-gray-500">Enhanced Response</span>
+                <h1 className="text-4xl font-semibold text-gray-900 mb-4 text-center">
+                  Apa yang bisa saya bantu?
+                </h1>
+
+                {/* Suggestion Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8 w-full max-w-2xl">
+                  <button
+                    onClick={() => insertSuggestion("Buat gambar")}
+                    className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-left"
+                  >
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                      <Image className="w-4 h-4 text-green-600" />
                     </div>
-                    <div className="flex items-center space-x-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(message.content)}
-                        className="p-1.5 h-auto text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg"
+                    <span className="text-gray-700 font-medium">Buat gambar</span>
+                  </button>
+
+                  <button
+                    onClick={() => insertSuggestion("Dapatkan nasihat")}
+                    className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-left"
+                  >
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <Lightbulb className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <span className="text-gray-700 font-medium">Dapatkan nasihat</span>
+                  </button>
+
+                  <button
+                    onClick={() => insertSuggestion("Kejutkan saya")}
+                    className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-left"
+                  >
+                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <Sparkles className="w-4 h-4 text-purple-600" />
+                    </div>
+                    <span className="text-gray-700 font-medium">Kejutkan saya</span>
+                  </button>
+
+                  <button
+                    onClick={() => insertSuggestion("Kode")}
+                    className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-left"
+                  >
+                    <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                      <FileText className="w-4 h-4 text-orange-600" />
+                    </div>
+                    <span className="text-gray-700 font-medium">Kode</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Messages */
+              <div className="px-4 py-6 space-y-6 max-w-4xl mx-auto w-full">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex items-start space-x-4 ${
+                      message.role === "user" ? "justify-end" : ""
+                    }`}
+                  >
+                    {message.role === "assistant" && (
+                      <div className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-white text-sm font-bold">M</span>
+                      </div>
+                    )}
+
+                    <div className={`flex-1 ${message.role === "user" ? "flex flex-col items-end" : ""} max-w-3xl`}>
+                      {message.role === "assistant" && (
+                        <div className="flex items-center justify-between w-full mb-2">
+                          <span className="text-sm font-medium text-gray-900">Mario AI</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyToClipboard(message.content)}
+                            className="p-1 h-auto text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
+                          >
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      )}
+                      <div
+                        className={`${
+                          message.role === "user"
+                            ? "bg-gray-900 text-white rounded-2xl px-4 py-3 max-w-md"
+                            : "text-gray-900 w-full"
+                        }`}
                       >
-                        <Copy className="w-3 h-3" />
-                      </Button>
+                        {message.role === "assistant" ? (
+                          <MarkdownMessage content={message.content} />
+                        ) : (
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                            {message.content}
+                          </p>
+                        )}
+                      </div>
+                      <div className="mt-1 text-xs text-gray-500 px-4">
+                        <span>{formatTimestamp(message.timestamp)}</span>
+                      </div>
+                    </div>
+
+                    {message.role === "user" && (
+                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <User className="w-4 h-4 text-white" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {/* AI Thinking Indicator */}
+                {isTyping && (
+                  <div className="flex items-start space-x-4">
+                    <div className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-sm font-bold">M</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <span className="text-sm font-medium text-gray-900">Mario AI</span>
+                        <span className="text-xs text-gray-500">sedang mengetik...</span>
+                      </div>
+                      <div className="bg-gray-100 rounded-2xl px-4 py-3 max-w-sm">
+                        <div className="flex items-center space-x-2">
+                          <div className="flex space-x-1">
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
-                <div
-                  className={`rounded-2xl px-5 py-4 message-shadow ${
-                    message.role === "user"
-                      ? "gradient-primary text-white rounded-tr-md border border-purple-300/20 max-w-md"
-                      : "bg-aiResponse text-textPrimary rounded-tl-md border border-white/30 w-full"
-                  }`}
+
+                <div ref={messagesEndRef} />
+              </div>
+            )}
+          </div>
+
+          {/* Input Area */}
+          <div className="border-t border-gray-200 bg-white px-4 py-4 sticky bottom-0">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex items-end space-x-3">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Textarea
+                      ref={textareaRef}
+                      value={inputValue}
+                      onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Tanyakan apa saja"
+                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-900 focus:border-gray-900 resize-none overflow-hidden max-h-32 text-sm bg-white shadow-sm"
+                      rows={1}
+                    />
+
+                    {/* Voice Input Button */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute bottom-2 right-2 p-2 h-8 w-8 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600"
+                    >
+                      <Mic className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={handleSend}
+                  disabled={!inputValue.trim() || sendMessageMutation.isPending}
+                  className="bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white p-3 rounded-full transition-all duration-200 shadow-sm"
                 >
-                  {message.role === "assistant" ? (
-                    <MarkdownMessage content={message.content} />
+                  {sendMessageMutation.isPending ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                      {message.content}
-                    </p>
+                    <Send className="w-4 h-4" />
                   )}
-                </div>
-                <div className="mt-2 text-xs text-gray-500 px-5 flex items-center space-x-2">
-                  <span>{formatTimestamp(message.timestamp)}</span>
-                  {message.role === "assistant" && (
-                    <>
-                      <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-                      <span className="text-purple-500 font-medium">Enhanced AI</span>
-                    </>
-                  )}
-                </div>
+                </Button>
               </div>
-
-              {message.role === "user" && (
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                  <User className="w-5 h-5 text-white" />
-                </div>
-              )}
-            </div>
-          ))}
-
-          {/* AI Thinking Indicator */}
-          {isTyping && (
-            <div className="flex items-start space-x-3">
-              <div className="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                <Sparkles className="w-5 h-5 text-white animate-pulse" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center space-x-2 mb-2 px-4">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-semibold text-purple-600">Mario AI</span>
-                  <span className="text-xs text-gray-500">sedang berpikir...</span>
-                </div>
-                <div className="bg-aiResponse rounded-2xl rounded-tl-md px-5 py-4 max-w-sm message-shadow border border-white/30">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-100"></div>
-                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-200"></div>
-                    </div>
-                    <span className="text-sm text-purple-700 font-medium">AI sedang menganalisis...</span>
-                  </div>
-                  <div className="mt-2 flex items-center space-x-2 text-xs text-gray-600">
-                    <div className="w-4 h-1 bg-purple-200 rounded-full overflow-hidden">
-                      <div className="w-full h-full bg-purple-400 rounded-full animate-pulse"></div>
-                    </div>
-                    <span>Memproses respons</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div ref={messagesEndRef} />
-        </div>
-
-        
-
-        {/* Suggestions */}
-        {messages.length === 0 && !isTyping && (
-          <div className="px-3 sm:px-4 pb-4 sm:pb-6 max-w-6xl mx-auto w-full">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {[
-                "Ceritakan lelucon lucu tentang teknologi",
-                "Jelaskan kecerdasan buatan dengan sederhana", 
-                "Buatkan puisi tentang teknologi",
-                "Bagaimana cara belajar programming?"
-              ].map((suggestion, index) => (
-                <button
-                  key={index}
-                  onClick={() => insertSuggestion(suggestion)}
-                  className="p-3 text-left text-sm text-gray-600 bg-white/60 hover:bg-white/80 rounded-xl border border-purple-100 hover:border-purple-200 transition-all duration-200 hover:shadow-md active:scale-95 transform touch-manipulation"
-                >
-                  {suggestion}
-                </button>
-              ))}
             </div>
           </div>
-        )}
-
-        {/* Input Area */}
-        <div className="border-t border-white/20 bg-gradient-to-b from-white/50 to-white/80 backdrop-blur-sm px-3 sm:px-4 py-3 sm:py-6 sticky bottom-0 mobile-safe-area">
-          <div className="max-w-6xl mx-auto">
-            {/* Quick Actions - Mobile optimized */}
-            <div className="flex items-center space-x-2 mb-3 overflow-x-auto scrollbar-hide lg:hidden">
-              {[
-                { icon: Plus, label: "Baru", action: createNewChat },
-                { icon: History, label: "Riwayat", action: () => setShowSidebar(true) },
-                { icon: Trash2, label: "Hapus", action: () => clearMessagesMutation.mutate() }
-              ].map((item, index) => (
-                <Button
-                  key={index}
-                  variant="ghost"
-                  size="sm"
-                  onClick={item.action}
-                  className="flex items-center space-x-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-full bg-white/70 hover:bg-white/90 border border-purple-100 text-purple-600 hover:text-purple-700 transition-all duration-200 whitespace-nowrap text-xs"
-                >
-                  <item.icon className="w-3 h-3" />
-                  <span className="font-medium">{item.label}</span>
-                </Button>
-              ))}
-            </div>
-
-            {/* Desktop Quick Actions */}
-            <div className="hidden lg:flex items-center space-x-2 mb-3">
-              {[
-                { icon: Plus, label: "Chat Baru", action: createNewChat },
-                { icon: History, label: "Riwayat", action: () => setShowSidebar(true) },
-                { icon: Trash2, label: "Hapus", action: () => clearMessagesMutation.mutate() }
-              ].map((item, index) => (
-                <Button
-                  key={index}
-                  variant="ghost"
-                  size="sm"
-                  onClick={item.action}
-                  className="flex items-center space-x-1 px-3 py-2 rounded-full bg-white/70 hover:bg-white/90 border border-purple-100 text-purple-600 hover:text-purple-700 transition-all duration-200 whitespace-nowrap"
-                >
-                  <item.icon className="w-3 h-3" />
-                  <span className="text-xs font-medium">{item.label}</span>
-                </Button>
-              ))}
-            </div>
-
-            <div className="flex items-end space-x-2 sm:space-x-3">
-              <div className="flex-1">
-                {/* AI Tools Row */}
-                <div className="flex items-center space-x-2 mb-3 px-1">
-                  <div className="flex items-center space-x-1 text-xs text-gray-600">
-                    <Sparkles className="w-3 h-3 text-purple-500" />
-                    <span className="font-medium">AI Tools:</span>
-                  </div>
-                  <div className="flex items-center space-x-1 overflow-x-auto scrollbar-hide">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="px-2 py-1 h-auto text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg border border-purple-200/50 whitespace-nowrap"
-                      onClick={() => insertSuggestion("Analisis teks ini: ")}
-                    >
-                      📊 Analisis
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="px-2 py-1 h-auto text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg border border-blue-200/50 whitespace-nowrap"
-                      onClick={() => insertSuggestion("Rangkum konten ini: ")}
-                    >
-                      📝 Rangkum
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="px-2 py-1 h-auto text-xs bg-green-50 hover:bg-green-100 text-green-700 rounded-lg border border-green-200/50 whitespace-nowrap"
-                      onClick={() => insertSuggestion("Jelaskan seperti untuk anak 5 tahun: ")}
-                    >
-                      🧠 Sederhana
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="px-2 py-1 h-auto text-xs bg-pink-50 hover:bg-pink-100 text-pink-700 rounded-lg border border-pink-200/50 whitespace-nowrap"
-                      onClick={() => insertSuggestion("Buatkan kode untuk: ")}
-                    >
-                      💻 Koding
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="relative">
-                  <Textarea
-                    ref={textareaRef}
-                    value={inputValue}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Tanyakan apa saja kepada Mario AI... Gunakan AI Tools di atas untuk bantuan cepat!"
-                    className="w-full px-4 py-4 pr-16 border-2 border-purple-200/50 rounded-2xl focus:ring-2 focus:ring-purple-400 focus:border-purple-400 resize-none overflow-hidden mobile-input max-h-32 text-sm text-textPrimary bg-white/95 backdrop-blur-sm shadow-lg placeholder:text-gray-500 transition-all duration-200"
-                    rows={1}
-                  />
-                  
-                  {/* Character Count */}
-                  <div className="absolute bottom-2 right-16 text-xs font-medium hidden sm:block">
-                    <span className={inputValue.length > 1800 ? "text-red-500" : inputValue.length > 1500 ? "text-amber-500" : "text-purple-500"}>
-                      {inputValue.length}
-                    </span>
-                    <span className="text-gray-400">/2000</span>
-                  </div>
-                  
-                  {/* Clear Button */}
-                  {inputValue.trim() && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setInputValue("")}
-                      className="absolute bottom-2 right-2 p-1 h-6 w-6 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600"
-                    >
-                      ×
-                    </Button>
-                  )}
-                  
-                  {/* AI Enhancement Indicator */}
-                  <div className="absolute top-2 right-2 hidden sm:flex items-center space-x-1 text-xs text-purple-600">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="font-medium">Enhanced</span>
-                  </div>
-                </div>
-              </div>
-              
-              <Button
-                onClick={handleSend}
-                disabled={!inputValue.trim() || sendMessageMutation.isPending}
-                className="gradient-primary hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-white p-3 sm:p-4 rounded-2xl transition-all duration-200 transform hover:scale-105 active:scale-95 border-2 border-purple-300/30 mobile-input shadow-lg flex-shrink-0"
-              >
-                {sendMessageMutation.isPending ? (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <Send className="w-4 h-4" />
-                )}
-              </Button>
-            </div>
-            
-            <div className="mt-2 text-xs text-gray-500 text-center hidden sm:block">
-              Tekan <kbd className="px-1 py-0.5 bg-gray-100 rounded text-gray-600">Enter</kbd> untuk kirim, 
-              <kbd className="px-1 py-0.5 bg-gray-100 rounded text-gray-600 ml-1">Shift + Enter</kbd> untuk baris baru
-            </div>
-          </div>
-        </div>
         </div>
       </div>
     </div>
