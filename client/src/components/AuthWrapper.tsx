@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { User, onAuthStateChanged } from "firebase/auth";
-import { auth, signInWithGoogle, signInWithGithub, logout } from "@/lib/firebase";
+import { auth, signInWithGoogle, logout } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
-import { LogIn, LogOut, User as UserIcon, Github } from "lucide-react";
+import { LogIn, LogOut, User as UserIcon } from "lucide-react";
 
 interface AuthWrapperProps {
   children: (user: User | null) => React.ReactNode;
@@ -21,19 +21,11 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
     return () => unsubscribe();
   }, []);
 
-  const handleGoogleSignIn = async () => {
+  const handleSignIn = async () => {
     try {
       await signInWithGoogle();
     } catch (error) {
       console.error("Google sign in error:", error);
-    }
-  };
-
-  const handleGithubSignIn = async () => {
-    try {
-      await signInWithGithub();
-    } catch (error) {
-      console.error("GitHub sign in error:", error);
     }
   };
 
@@ -73,27 +65,16 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
               <p className="text-gray-600">Masuk untuk melanjutkan percakapan dengan AI</p>
             </div>
 
-            <div className="space-y-3">
-              <Button
-                onClick={handleGoogleSignIn}
-                className="w-full gradient-primary text-white py-3 rounded-2xl font-medium hover:shadow-lg transition-all duration-200"
-              >
-                <LogIn className="w-5 h-5 mr-2" />
-                Masuk dengan Google
-              </Button>
-
-              <Button
-                onClick={handleGithubSignIn}
-                variant="outline"
-                className="w-full py-3 rounded-2xl font-medium border-gray-200 hover:bg-gray-50 text-gray-700 transition-all duration-200"
-              >
-                <Github className="w-5 h-5 mr-2" />
-                Masuk dengan GitHub
-              </Button>
-            </div>
+            <Button
+              onClick={handleSignIn}
+              className="w-full gradient-primary text-white py-3 rounded-2xl font-medium hover:shadow-lg transition-all duration-200"
+            >
+              <LogIn className="w-5 h-5 mr-2" />
+              Masuk dengan Google
+            </Button>
 
             <div className="mt-6 text-center">
-              <p className="text-xs text-gray-500">Pilih metode masuk yang Anda sukai</p>
+              <p className="text-xs text-gray-500">Gunakan akun Google Anda untuk melanjutkan</p>
             </div>
           </div>
         </div>
