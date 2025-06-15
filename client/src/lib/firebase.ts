@@ -1,25 +1,31 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
+import { initializeApp, getApps } from "firebase/app";
+import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, signOut } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaBySsKmpVQ4DZcc8eR-UpGgmCKWcKLNXfT4",
+  apiKey: "AIzaByBmwyM4DZcceBR-UZgmcWmOLNkYT4",
   authDomain: "mario-chatt.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "mario-chatt",
+  projectId: "mario-chatt",
   storageBucket: "mario-chatt.firebasestorage.app",
   messagingSenderId: "549135172436",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:549135172436:web:d165b694bb9a6eb4ecbec1",
-  measurementId: "G-7MM8GRJMHE"
+  appId: "1:549135172436:web:d165b694bb9a6eb4ecbec1",
+  measurementId: "G-7MBBGJMHE"
 };
 
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase only if it hasn't been initialized yet
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-const provider = new GoogleAuthProvider();
+const googleProvider = new GoogleAuthProvider();
+const githubProvider = new GithubAuthProvider();
 
 export const signInWithGoogle = () => {
-  return signInWithPopup(auth, provider);
+  return signInWithPopup(auth, googleProvider);
+};
+
+export const signInWithGithub = () => {
+  return signInWithPopup(auth, githubProvider);
 };
 
 export const logout = () => {
