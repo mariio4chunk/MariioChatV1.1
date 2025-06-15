@@ -4,7 +4,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Bot, User, Settings, Trash2 } from "lucide-react";
+import { Send, Bot, User, Settings, Trash2, Sparkles, Zap } from "lucide-react";
 import type { Message } from "@shared/schema";
 
 export default function Chat() {
@@ -126,17 +126,24 @@ export default function Chat() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-chat">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 shadow-sm">
+      <header className="bg-header border-b border-white/20 px-4 py-4 shadow-lg">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
-              <Bot className="w-4 h-4 text-white" />
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <div className="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center shadow-lg">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white flex items-center justify-center">
+                <Zap className="w-2 h-2 text-white" />
+              </div>
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-textPrimary">Gemini AI</h1>
-              <p className="text-xs text-gray-500">Google Gemini-1.5-Flash</p>
+              <h1 className="text-xl font-bold text-textPrimary bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                IntelliChat AI
+              </h1>
+              <p className="text-sm text-gray-600 font-medium">Powered by Advanced AI • v2.1</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -149,11 +156,11 @@ export default function Chat() {
               size="sm"
               onClick={() => clearMessagesMutation.mutate()}
               disabled={clearMessagesMutation.isPending}
-              className="p-2 text-gray-400 hover:text-gray-600"
+              className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-200"
             >
               <Trash2 className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="sm" className="p-2 text-gray-400 hover:text-gray-600">
+            <Button variant="ghost" size="sm" className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-200">
               <Settings className="w-4 h-4" />
             </Button>
           </div>
@@ -165,18 +172,26 @@ export default function Chat() {
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
           {messages.length === 0 && (
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
-                <Bot className="w-4 h-4 text-white" />
+            <div className="flex items-start space-x-4">
+              <div className="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <div className="bg-aiResponse rounded-2xl rounded-tl-md px-4 py-3 max-w-3xl">
+                <div className="bg-aiResponse rounded-3xl rounded-tl-lg px-6 py-4 max-w-3xl message-shadow border border-white/30">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs font-semibold text-purple-600">IntelliChat AI</span>
+                  </div>
                   <p className="text-textPrimary text-sm leading-relaxed">
-                    Hello! I'm your AI assistant powered by Google Gemini-1.5-Flash. I'm here to help you with questions, creative tasks, analysis, and conversation. What would you like to explore today?
+                    Selamat datang di <span className="font-semibold text-purple-600">IntelliChat AI</span>! 🚀 
+                    Saya adalah asisten AI canggih yang siap membantu Anda dengan berbagai tugas seperti menjawab pertanyaan, 
+                    analisis data, menulis konten kreatif, dan diskusi mendalam. Mari mulai percakapan yang menarik!
                   </p>
                 </div>
-                <div className="mt-1 text-xs text-gray-500 px-4">
-                  <span>Just now</span>
+                <div className="mt-2 text-xs text-gray-500 px-6 flex items-center space-x-2">
+                  <span>Baru saja</span>
+                  <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                  <span className="text-purple-500 font-medium">AI Ready</span>
                 </div>
               </div>
             </div>
@@ -190,31 +205,43 @@ export default function Chat() {
               }`}
             >
               {message.role === "assistant" && (
-                <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-4 h-4 text-white" />
+                <div className="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <Sparkles className="w-5 h-5 text-white" />
                 </div>
               )}
               
               <div className={`flex-1 ${message.role === "user" ? "flex flex-col items-end" : ""}`}>
+                {message.role === "assistant" && (
+                  <div className="flex items-center space-x-2 mb-1 px-6">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span className="text-xs font-semibold text-purple-600">IntelliChat AI</span>
+                  </div>
+                )}
                 <div
-                  className={`rounded-2xl px-4 py-3 max-w-3xl ${
+                  className={`rounded-3xl px-6 py-4 max-w-3xl message-shadow ${
                     message.role === "user"
-                      ? "bg-primary text-white rounded-tr-md"
-                      : "bg-aiResponse text-textPrimary rounded-tl-md"
+                      ? "gradient-primary text-white rounded-tr-lg border border-purple-300/20"
+                      : "bg-aiResponse text-textPrimary rounded-tl-lg border border-white/30"
                   }`}
                 >
                   <p className="text-sm leading-relaxed whitespace-pre-wrap">
                     {message.content}
                   </p>
                 </div>
-                <div className="mt-1 text-xs text-gray-500 px-4">
+                <div className="mt-2 text-xs text-gray-500 px-6 flex items-center space-x-2">
                   <span>{formatTimestamp(message.timestamp)}</span>
+                  {message.role === "assistant" && (
+                    <>
+                      <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                      <span className="text-purple-500 font-medium">AI Response</span>
+                    </>
+                  )}
                 </div>
               </div>
 
               {message.role === "user" && (
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="w-4 h-4 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <User className="w-5 h-5 text-white" />
                 </div>
               )}
             </div>
@@ -222,20 +249,27 @@ export default function Chat() {
 
           {/* Typing Indicator */}
           {isTyping && (
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
-                <Bot className="w-4 h-4 text-white" />
+            <div className="flex items-start space-x-4">
+              <div className="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                <Sparkles className="w-5 h-5 text-white animate-pulse" />
               </div>
               <div className="flex-1">
-                <div className="bg-aiResponse rounded-2xl rounded-tl-md px-4 py-3 max-w-xs">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-200"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-500"></div>
+                <div className="flex items-center space-x-2 mb-1 px-6">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-xs font-semibold text-purple-600">IntelliChat AI</span>
+                </div>
+                <div className="bg-aiResponse rounded-3xl rounded-tl-lg px-6 py-4 max-w-xs message-shadow border border-white/30">
+                  <div className="flex space-x-1 items-center">
+                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-200"></div>
+                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-500"></div>
+                    <span className="text-xs text-purple-600 ml-2 font-medium">Sedang mengetik...</span>
                   </div>
                 </div>
-                <div className="mt-1 text-xs text-gray-500 px-4">
-                  AI is typing...
+                <div className="mt-2 text-xs text-gray-500 px-6 flex items-center space-x-2">
+                  <span>AI sedang berpikir...</span>
+                  <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                  <span className="text-purple-500 font-medium">Processing</span>
                 </div>
               </div>
             </div>
@@ -245,8 +279,8 @@ export default function Chat() {
         </div>
 
         {/* Input Area */}
-        <div className="border-t border-gray-200 bg-white px-4 py-4">
-          <div className="flex items-end space-x-3">
+        <div className="border-t border-white/20 bg-header px-4 py-6">
+          <div className="flex items-end space-x-4">
             <div className="flex-1">
               <div className="relative">
                 <Textarea
@@ -254,12 +288,12 @@ export default function Chat() {
                   value={inputValue}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
-                  placeholder="Type your message here..."
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent resize-none overflow-hidden min-h-[44px] max-h-32 text-sm text-textPrimary"
+                  placeholder="Ketik pesan Anda di sini..."
+                  className="w-full px-6 py-4 pr-16 border border-purple-200/50 rounded-3xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none overflow-hidden min-h-[56px] max-h-32 text-sm text-textPrimary bg-white/80 backdrop-blur-sm shadow-lg placeholder:text-gray-500"
                   rows={1}
                 />
-                <div className="absolute bottom-2 right-12 text-xs text-gray-400">
-                  <span className={inputValue.length > 1800 ? "text-red-500" : inputValue.length > 1500 ? "text-yellow-500" : ""}>
+                <div className="absolute bottom-2 right-16 text-xs text-gray-400 font-medium">
+                  <span className={inputValue.length > 1800 ? "text-red-500" : inputValue.length > 1500 ? "text-amber-500" : "text-purple-500"}>
                     {inputValue.length}
                   </span>/2000
                 </div>
@@ -267,30 +301,30 @@ export default function Chat() {
               
               {/* Suggestions */}
               {messages.length === 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
+                <div className="mt-4 flex flex-wrap gap-3">
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full h-auto"
-                    onClick={() => insertSuggestion("Tell me a joke")}
+                    className="px-4 py-2 text-xs bg-gradient-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 text-purple-700 rounded-full h-auto border border-purple-200/50 font-medium transition-all duration-200 shadow-sm"
+                    onClick={() => insertSuggestion("Ceritakan lelucon lucu")}
                   >
-                    Tell me a joke
+                    ✨ Ceritakan lelucon lucu
                   </Button>
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full h-auto"
-                    onClick={() => insertSuggestion("Explain quantum computing")}
+                    className="px-4 py-2 text-xs bg-gradient-to-r from-blue-100 to-purple-100 hover:from-blue-200 hover:to-purple-200 text-blue-700 rounded-full h-auto border border-blue-200/50 font-medium transition-all duration-200 shadow-sm"
+                    onClick={() => insertSuggestion("Jelaskan kecerdasan buatan")}
                   >
-                    Explain quantum computing
+                    🤖 Jelaskan kecerdasan buatan
                   </Button>
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full h-auto"
-                    onClick={() => insertSuggestion("Write a poem")}
+                    className="px-4 py-2 text-xs bg-gradient-to-r from-pink-100 to-rose-100 hover:from-pink-200 hover:to-rose-200 text-pink-700 rounded-full h-auto border border-pink-200/50 font-medium transition-all duration-200 shadow-sm"
+                    onClick={() => insertSuggestion("Buatkan puisi tentang teknologi")}
                   >
-                    Write a poem
+                    📝 Buatkan puisi tentang teknologi
                   </Button>
                 </div>
               )}
